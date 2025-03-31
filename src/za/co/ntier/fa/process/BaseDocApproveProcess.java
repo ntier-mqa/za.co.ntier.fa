@@ -14,23 +14,25 @@ import org.compiere.util.Msg;
 import za.ntier.utils.Notifications;
 
 @org.adempiere.base.annotation.Process(name="za.co.ntier.fa.process.BaseDocApproveProcess")
-public class BaseDocApproveProcess extends SvrProcess{
+public class BaseDocApproveProcess<T extends PO> extends SvrProcess{
 	@Parameter(name="ZZ_Approve_Rej_LM")
 	protected String pApproveRejLM;
 	@Parameter(name="ZZ_Approve_Rej_SAF")
 	protected String pApproveRejSAF;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void prepare() {
-		
+		MTable table = MTable.get(getCtx(), getTable_ID());
+		poObj = (T)table.getPO(getRecord_ID(), get_TrxName());
+		docApprove = POWrapper.create(poObj, IDocApprove.class);
 	}
 	
+	protected T poObj;
+	protected IDocApprove docApprove;
+	
 	@Override
-	protected String doIt() throws Exception {
-		MTable table = MTable.get(getCtx(), getTable_ID());
-		PO po = table.getPO(getRecord_ID(), get_TrxName());
-		//PO po = new GenericPO(table.getTableName(), getCtx(),getRecord_ID());
-		IDocApprove docApprove = POWrapper.create(po, IDocApprove.class);
+	protected String doIt() throws Exception {		
 		if (docApprove.getZZ_DocAction().equals(IDocApprove.ZZ_DOCACTION_SubmitToLineManager)) {
 			if (docApprove.getLine_Manager_ID() <= 0) {
 				return Msg.getMsg(getCtx(), "ZZ_ApproveChooseLineManager");
@@ -125,7 +127,7 @@ public class BaseDocApproveProcess extends SvrProcess{
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Completed);
 			docApprove.setZZ_Date_Completed(new Timestamp(System.currentTimeMillis()));
 		}
-		if (!po.save()) {
+		if (!poObj.save()) {
 			if (log.isLoggable(Level.FINE)) log.fine("Problem Saving.  Please contact Support");
 			return Msg.getMsg(getCtx(), "ZZ_PO_SaveProblem");
 		}

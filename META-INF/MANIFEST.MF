@@ -10,6 +10,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: org.adempiere.base,
  org.adempiere.base.annotation,
  org.adempiere.model,
+ org.adempiere.util,
  org.compiere.model,
  org.compiere.process,
  org.compiere.util,
