@@ -11,7 +11,7 @@ import za.co.ntier.fa.depreciation.MqaDepreciationMethod;
 		 property= {"service.ranking:Integer=2"},
 		 service = IDepreciationMethodFactory.class
 		 )
-public class NtierDepreciationMethodFactory implements IDepreciationMethodFactory {
+public class MQAFADepreciationMethodFactory implements IDepreciationMethodFactory {
 
 	@Override
 	public IDepreciationMethod getDepreciationMethod(DepreciationFactoryLookupDTO factoryLookupDTO) {

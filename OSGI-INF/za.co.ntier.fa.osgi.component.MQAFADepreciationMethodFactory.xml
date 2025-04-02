@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="za.co.ntier.fa.osgi.component.NtierDepreciationMethodFactory">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="za.co.ntier.fa.osgi.component.MQAFADepreciationMethodFactory">
    <property name="service.ranking" type="Integer" value="2"/>
    <service>
       <provide interface="org.idempiere.fa.service.api.IDepreciationMethodFactory"/>
    </service>
-   <implementation class="za.co.ntier.fa.osgi.component.NtierDepreciationMethodFactory"/>
+   <implementation class="za.co.ntier.fa.osgi.component.MQAFADepreciationMethodFactory"/>
 </scr:component>

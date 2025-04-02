@@ -17,7 +17,7 @@ Import-Package: org.adempiere.base,
  org.compiere.util,
  org.idempiere.fa.service.api,
  za.ntier.utils
-Service-Component: OSGI-INF/za.co.ntier.fa.osgi.component.AnnotationModelFactory.xml,
- OSGI-INF/za.co.ntier.fa.osgi.component.AnnotationProcessFactory.xml,
- OSGI-INF/za.co.ntier.fa.osgi.component.MqaFAAnnotationColumnCalloutFactory.xml,
- OSGI-INF/za.co.ntier.fa.osgi.component.NtierDepreciationMethodFactory.xml
+Service-Component: OSGI-INF/za.co.ntier.fa.osgi.component.MQAFAAnnotationModelFactory.xml,
+ OSGI-INF/za.co.ntier.fa.osgi.component.MQAFADepreciationMethodFactory.xml,
+ OSGI-INF/za.co.ntier.fa.osgi.component.MQAFAnnotationProcessFactory.xml,
+ OSGI-INF/za.co.ntier.fa.osgi.component.MqaFAAnnotationColumnCalloutFactory.xml
