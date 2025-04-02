@@ -1,9 +1,9 @@
 package za.co.ntier.fa.process;
 
 import java.sql.Timestamp;
-import java.util.logging.Level;
 
 import org.adempiere.base.annotation.Parameter;
+import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
 import org.compiere.model.MTable;
 import org.compiere.model.PO;
@@ -25,25 +25,95 @@ public class BaseDocApproveProcess<T extends PO> extends SvrProcess{
 	protected void prepare() {
 		MTable table = MTable.get(getCtx(), getTable_ID());
 		poObj = (T)table.getPO(getRecord_ID(), get_TrxName());
+		initDocApproveObj();
+		now = new Timestamp(System.currentTimeMillis());
+	}
+	
+	protected void initDocApproveObj() {
 		docApprove = POWrapper.create(poObj, IDocApprove.class);
 	}
 	
 	protected T poObj;
 	protected IDocApprove docApprove;
+	protected Timestamp now = null;
 	
-	@Override
-	protected String doIt() throws Exception {		
-		if (docApprove.getZZ_DocAction().equals(IDocApprove.ZZ_DOCACTION_SubmitToLineManager)) {
-			if (docApprove.getLine_Manager_ID() <= 0) {
-				return Msg.getMsg(getCtx(), "ZZ_ApproveChooseLineManager");
-			}
-			if (!docApprove.isZZ_ID_Copy_Uploaded()) {
-				return Msg.getMsg(getCtx(), "ZZ_ApproveUploadCopyID");
-			}
-			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Submitted);
-			docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
-			docApprove.setZZ_Date_Submitted(new Timestamp(System.currentTimeMillis()));
-			
+	protected void doSubmitDocForLineManage(){
+		if (docApprove.getLine_Manager_ID() <= 0)
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_ApproveChooseLineManager"));
+		
+		if (!docApprove.isZZ_ID_Copy_Uploaded())
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_ApproveUploadCopyID"));
+		
+		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Submitted);
+		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
+		docApprove.setZZ_Date_Submitted(now);
+		
+		Notifications.sendNotification(
+				docApprove.getLine_Manager_ID(),
+				getRecord_ID(),
+				docApprove.getSubject(),
+				docApprove.getMessage(),
+				docApprove.getMessageID(),
+				getCtx(),
+				get_TrxName(),
+				getTable_ID());
+	}
+	
+	protected void doLineManageApprove() {
+		if("Y".equals(pApproveRejLM)){
+			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_InProgress);
+			docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove);
+			docApprove.setZZ_Date_LM_Approved(now);
+			Notifications.sendNotificationToRole(
+					IDocApprove.SNR_ADMIN_FIN_ROLE_ID,
+					getRecord_ID(),
+					docApprove.getSubject(),
+					docApprove.getMessage(),
+					docApprove.getMessageID(),
+					getCtx(),
+					get_TrxName(),
+					getTable_ID());
+		}else{
+			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByLM);
+			docApprove.setZZ_Date_Not_Approved_by_LM(now);
+			Notifications.sendNotification(
+					docApprove.getCreatedBy(),
+					getRecord_ID(),
+					docApprove.getSubject(),
+					docApprove.getMessage(),
+					docApprove.getMessageID(),
+					getCtx(),
+					get_TrxName(),
+					getTable_ID());
+		}
+	}
+	
+	protected void doSnrAdminFinanceApprove() {
+		if (pApproveRejSAF.equals("Y")) {
+			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Approved);
+			docApprove.setZZ_Date_Approved(now);
+			docApprove.setZZ_Snr_Admin_Fin_ID(Env.getAD_User_ID(getCtx()));
+			Notifications.sendNotification(
+					docApprove.getCreatedBy(),
+					getRecord_ID(),
+					docApprove.getSubject(),
+					docApprove.getMessage(),
+					docApprove.getMessageID(),
+					getCtx(),
+					get_TrxName(),
+					getTable_ID());
+		} else {
+			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance);
+			docApprove.setZZ_Date_Not_Approved_by_Snr_Adm_Fin(now);
+			Notifications.sendNotification(
+					docApprove.getCreatedBy(),
+					getRecord_ID(),
+					docApprove.getSubject(),
+					docApprove.getMessage(),
+					docApprove.getMessageID(),
+					getCtx(),
+					get_TrxName(),
+					getTable_ID());
 			Notifications.sendNotification(
 					docApprove.getLine_Manager_ID(),
 					getRecord_ID(),
@@ -53,84 +123,63 @@ public class BaseDocApproveProcess<T extends PO> extends SvrProcess{
 					getCtx(),
 					get_TrxName(),
 					getTable_ID());
-		} else if (docApprove.getZZ_DocAction().equals(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove) && 
-				docApprove.getZZ_DocStatus().equals(IDocApprove.ZZ_DOCSTATUS_Submitted)) {
-			if (pApproveRejLM.equals("Y")) {
-				docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_InProgress);
-				docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove);
-				docApprove.setZZ_Date_LM_Approved(new Timestamp(System.currentTimeMillis()));
-				Notifications.sendNotificationToRole(
-						IDocApprove.SNR_ADMIN_FIN_ROLE_ID,
-						getRecord_ID(),
-						docApprove.getSubject(),
-						docApprove.getMessage(),
-						docApprove.getMessageID(),
-						getCtx(),
-						get_TrxName(),
-						getTable_ID());
-			} else {
-				docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByLM);
-				docApprove.setZZ_Date_Not_Approved_by_LM(new Timestamp(System.currentTimeMillis()));
-				Notifications.sendNotification(
-						docApprove.getCreatedBy(),
-						getRecord_ID(),
-						docApprove.getSubject(),
-						docApprove.getMessage(),
-						docApprove.getMessageID(),
-						getCtx(),
-						get_TrxName(),
-						getTable_ID());
-			}
-		} else if (docApprove.getZZ_DocAction().equals(IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove) && 
-				docApprove.getZZ_DocStatus().equals(IDocApprove.ZZ_DOCSTATUS_InProgress)) {
-			if (pApproveRejSAF.equals("Y")) {
-				docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Approved);
-				docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_Complete);
-				docApprove.setZZ_Date_Approved(new Timestamp(System.currentTimeMillis()));
-				docApprove.setZZ_Snr_Admin_Fin_ID(Env.getAD_User_ID(getCtx()));
-				Notifications.sendNotification(
-						docApprove.getCreatedBy(),
-						getRecord_ID(),
-						docApprove.getSubject(),
-						docApprove.getMessage(),
-						docApprove.getMessageID(),
-						getCtx(),
-						get_TrxName(),
-						getTable_ID());
-			} else {
-				docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance);
-				docApprove.setZZ_Date_Not_Approved_by_Snr_Adm_Fin(new Timestamp(System.currentTimeMillis()));
-				Notifications.sendNotification(
-						docApprove.getCreatedBy(),
-						getRecord_ID(),
-						docApprove.getSubject(),
-						docApprove.getMessage(),
-						docApprove.getMessageID(),
-						getCtx(),
-						get_TrxName(),
-						getTable_ID());
-				Notifications.sendNotification(
-						docApprove.getLine_Manager_ID(),
-						getRecord_ID(),
-						docApprove.getSubject(),
-						docApprove.getMessage(),
-						docApprove.getMessageID(),
-						getCtx(),
-						get_TrxName(),
-						getTable_ID());
-			}
-		} else if (docApprove.getZZ_DocAction().equals(IDocApprove.ZZ_DOCACTION_Complete) && 
-				docApprove.getZZ_DocStatus().equals(IDocApprove.ZZ_DOCSTATUS_Approved)) {
-			if (!docApprove.isZZ_AOR_Uploaded()) {
-				return Msg.getMsg(getCtx(), "ZZ_ApproveUploadAOR");
-			}
-			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Completed);
-			docApprove.setZZ_Date_Completed(new Timestamp(System.currentTimeMillis()));
 		}
-		if (!poObj.save()) {
-			if (log.isLoggable(Level.FINE)) log.fine("Problem Saving.  Please contact Support");
-			return Msg.getMsg(getCtx(), "ZZ_PO_SaveProblem");
+	}
+	
+	protected void doFinalDocState(String currentDocAction) {
+		boolean isFinalApprove = false;
+		if (docApprove.getZZ_FinalWorkflowStateValue() == null)
+            return;
+		
+		isFinalApprove = docApprove.isZZ_AllowLineManageApproved() && !docApprove.isZZ_AllowSnrAdminFinanceApproved() &&
+				IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) &&
+				"Y".equals(pApproveRejLM);
+		
+		if (!isFinalApprove)
+			isFinalApprove = docApprove.isZZ_AllowSnrAdminFinanceApproved() &&
+					IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove.equals(currentDocAction) &&
+					"Y".equals(pApproveRejSAF);
+		
+		if (isFinalApprove && docApprove.getZZ_FinalWorkflowStateValue() != null) {
+			docApprove.setZZ_DocStatus(docApprove.getZZ_FinalWorkflowStateValue());
+			if(IDocApprove.ZZ_DOCSTATUS_Completed.equals(docApprove.getZZ_FinalWorkflowStateValue()))
+				docApprove.setZZ_Date_Completed(now);
+			if(IDocApprove.ZZ_DOCSTATUS_Approved.equals(docApprove.getZZ_FinalWorkflowStateValue()))
+				docApprove.setZZ_Date_Approved(now);
 		}
+		
+	}
+	
+	@Override
+	protected String doIt() throws Exception {
+		String currentDocAction = docApprove.getZZ_DocAction();
+		String currentDocStatus = docApprove.getZZ_DocStatus();
+		if(docApprove.isZZ_AllowLineManageApproved() && 
+				IDocApprove.ZZ_DOCACTION_SubmitToLineManager.equals(currentDocAction)) {
+
+			doSubmitDocForLineManage();
+			
+		}else if(docApprove.isZZ_AllowLineManageApproved() &&
+				IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove.equals(currentDocAction) && 
+				IDocApprove.ZZ_DOCSTATUS_Submitted.equals(currentDocStatus)) {
+			
+			doLineManageApprove();
+			
+		}else if(docApprove.isZZ_AllowSnrAdminFinanceApproved() &&
+				IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove.equals(currentDocAction) && 
+				IDocApprove.ZZ_DOCSTATUS_InProgress.equals(currentDocStatus)) {
+			
+			doSnrAdminFinanceApprove();
+			
+		}else {
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_WrongWorkflowState", 
+					new Object [] {docApprove.isZZ_AllowLineManageApproved(),
+					docApprove.isZZ_AllowSnrAdminFinanceApproved(),
+					currentDocStatus,
+					currentDocAction}));
+		}
+		doFinalDocState(currentDocAction);
+		poObj.saveEx();
 
 		return null;
 	}

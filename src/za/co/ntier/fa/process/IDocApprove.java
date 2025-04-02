@@ -36,23 +36,79 @@ public interface IDocApprove {
 	
 	public void setZZ_DocStatus(String docStatus);
 	public String getZZ_DocStatus();
-	
-	public Timestamp getZZ_Date_Submitted();
-	public void setZZ_Date_Submitted(Timestamp submittDate);
-	public void setZZ_Date_LM_Approved(Timestamp approveDate);
-	public void setZZ_Date_Approved (Timestamp approveDate);
-	public void setZZ_Date_Not_Approved_by_LM(Timestamp notApproveDate);
-	public void setZZ_Date_Completed (Timestamp completeDate);
 	public String getDocumentNo();
+	
+	/**
+	 * set time when user submits the document to approve
+	 * @param submittDate
+	 */
+	public void setZZ_Date_Submitted(Timestamp submittDate);
+	/**
+	 * line manage (in case ZZ_AllowLineManageApproved = Y)
+	 * @return
+	 */
 	public int getLine_Manager_ID();
+	/**
+	 * get time when user submits the document to approve
+	 * @return
+	 */
+	public Timestamp getZZ_Date_Submitted();
+	/**
+	 * time when line manager approves the document (in case ZZ_AllowLineManageApproved = Y)
+	 * @param approveDate
+	 */
+	public void setZZ_Date_LM_Approved(Timestamp approveDate);
+
+	/**
+	 * time when line manager rejects the document (in case ZZ_AllowLineManageApproved = Y)
+	 * @param notApproveDate
+	 */
+	public void setZZ_Date_Not_Approved_by_LM(Timestamp notApproveDate);
+
+	/**
+	 * when SnrAdminFinance approve document, Set his id here (in case ZZ_AllowSnrAdminFinanceApproved = Y)
+	 * @param ZZ_Snr_Admin_Fin_ID
+	 */
+	public void setZZ_Snr_Admin_Fin_ID(int ZZ_Snr_Admin_Fin_ID);
+	/**
+	 * set time when Snr Admin Finance approves the document (in case ZZ_AllowSnrAdminFinanceApproved = Y)
+	 * @param approveDate
+	 */
+	public void setZZ_Date_Approved (Timestamp approveDate);
+	/**
+	 * set time when Snr Admin Finance rejects the document (in case ZZ_AllowSnrAdminFinance = Y)
+	 * @param ZZ_Date_Not_Approved_by_Snr_Adm_Fin
+	 */
 	public void setZZ_Date_Not_Approved_by_Snr_Adm_Fin (Timestamp ZZ_Date_Not_Approved_by_Snr_Adm_Fin);
+	
+	/**
+	 * set time when document is completed (up to document type, doc can be auto completed after approved or manual do by submitter)
+	 * @param completeDate
+	 */
+	public void setZZ_Date_Completed (Timestamp completeDate);
+	/**
+	 * detect document need to approve by line manage
+	 * @return
+	 */
+	public boolean isZZ_AllowLineManageApproved();
+	/**
+	 * detect document need to approve by Snr Admin Finance
+	 * @return
+	 */
+	public boolean isZZ_AllowSnrAdminFinanceApproved();
+	/**
+	 * doc status after final approval
+	 * @return
+	 */
+	public String getZZ_FinalWorkflowStateValue();
+	
 	public default boolean isZZ_ID_Copy_Uploaded() {
 		return true;
 	}
 	public default boolean isZZ_AOR_Uploaded() {
 		return true;
 	}
-	public void setZZ_Snr_Admin_Fin_ID(int ZZ_Snr_Admin_Fin_ID);
+
 	public default String getSubject() {
 		return "default subject";
 	}
@@ -64,5 +120,11 @@ public interface IDocApprove {
 	public default int getMessageID() {
 		return 1000009;//TODO change to default message id
 	}
+
+	/**
+	 * get user who created/summit this document
+	 * 
+	 * @return
+	 */
 	public int getCreatedBy();
 }
