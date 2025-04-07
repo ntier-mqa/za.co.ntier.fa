@@ -1,7 +1,9 @@
 package za.co.ntier.fa.process;
 
+import org.adempiere.model.POWrapper;
 import org.compiere.model.MAsset;
 
+import za.co.ntier.fa.model.I_A_Asset;
 import za.co.ntier.fa.model.MZZAssetTransfer;
 
 @org.adempiere.base.annotation.Process(name="za.co.ntier.fa.process.AssetTrasferDocApproveProcess")
@@ -26,7 +28,10 @@ public class AssetTrasferDocApproveProcess extends BaseDocApproveProcess<MZZAsse
 
 	private void transferAsset() {
 		MAsset asset = new MAsset(getCtx(), poObj.getA_Asset_ID(), get_TrxName());
-		asset.setM_Locator_ID(poObj.getM_LocatorTo_ID());
+		I_A_Asset assetWrapper = POWrapper.create(asset, I_A_Asset.class);
+		assetWrapper.setM_Locator_ID(poObj.getM_LocatorTo_ID());
+		assetWrapper.setM_Warehouse_ID(poObj.getM_WarehouseTo_ID());
+		assetWrapper.setAD_User_ID(poObj.getZZ_AD_UserTo_ID());
 		asset.saveEx();
 	}
 

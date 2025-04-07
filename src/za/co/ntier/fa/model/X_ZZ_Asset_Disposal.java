@@ -32,7 +32,7 @@ public class X_ZZ_Asset_Disposal extends PO implements I_ZZ_Asset_Disposal, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250402L;
+	private static final long serialVersionUID = 20250407L;
 
     /** Standard Constructor */
     public X_ZZ_Asset_Disposal (Properties ctx, int ZZ_Asset_Disposal_ID, String trxName)

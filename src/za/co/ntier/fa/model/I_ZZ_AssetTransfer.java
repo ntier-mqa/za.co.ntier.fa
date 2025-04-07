@@ -64,6 +64,21 @@ public interface I_ZZ_AssetTransfer
 	  */
 	public int getAD_Org_ID();
 
+    /** Column name AD_User_ID */
+    public static final String COLUMNNAME_AD_User_ID = "AD_User_ID";
+
+	/** Set User/Contact.
+	  * User within the system - Internal or Business Partner Contact
+	  */
+	public void setAD_User_ID (int AD_User_ID);
+
+	/** Get User/Contact.
+	  * User within the system - Internal or Business Partner Contact
+	  */
+	public int getAD_User_ID();
+
+	public org.compiere.model.I_AD_User getAD_User() throws RuntimeException;
+
     /** Column name A_Asset_ID */
     public static final String COLUMNNAME_A_Asset_ID = "A_Asset_ID";
 
@@ -171,7 +186,7 @@ public interface I_ZZ_AssetTransfer
 	  */
 	public int getM_LocatorTo_ID();
 
-	public I_M_Locator getM_LocatorTo() throws RuntimeException;
+	public org.compiere.model.I_M_Locator getM_LocatorTo() throws RuntimeException;
 
     /** Column name M_Locator_ID */
     public static final String COLUMNNAME_M_Locator_ID = "M_Locator_ID";
@@ -187,6 +202,36 @@ public interface I_ZZ_AssetTransfer
 	public int getM_Locator_ID();
 
 	public I_M_Locator getM_Locator() throws RuntimeException;
+
+    /** Column name M_WarehouseTo_ID */
+    public static final String COLUMNNAME_M_WarehouseTo_ID = "M_WarehouseTo_ID";
+
+	/** Set Warehouse To.
+	  * To Storage Warehouse and Service Point
+	  */
+	public void setM_WarehouseTo_ID (int M_WarehouseTo_ID);
+
+	/** Get Warehouse To.
+	  * To Storage Warehouse and Service Point
+	  */
+	public int getM_WarehouseTo_ID();
+
+	public org.compiere.model.I_M_Warehouse getM_WarehouseTo() throws RuntimeException;
+
+    /** Column name M_Warehouse_ID */
+    public static final String COLUMNNAME_M_Warehouse_ID = "M_Warehouse_ID";
+
+	/** Set Warehouse.
+	  * Storage Warehouse and Service Point
+	  */
+	public void setM_Warehouse_ID (int M_Warehouse_ID);
+
+	/** Get Warehouse.
+	  * Storage Warehouse and Service Point
+	  */
+	public int getM_Warehouse_ID();
+
+	public org.compiere.model.I_M_Warehouse getM_Warehouse() throws RuntimeException;
 
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
@@ -216,6 +261,21 @@ public interface I_ZZ_AssetTransfer
 	  * Search key for the record in the format required - must be unique
 	  */
 	public String getValue();
+
+    /** Column name ZZ_AD_UserTo_ID */
+    public static final String COLUMNNAME_ZZ_AD_UserTo_ID = "ZZ_AD_UserTo_ID";
+
+	/** Set User/Contact To.
+	  * User within the system - Internal or Business Partner Contact
+	  */
+	public void setZZ_AD_UserTo_ID (int ZZ_AD_UserTo_ID);
+
+	/** Get User/Contact To.
+	  * User within the system - Internal or Business Partner Contact
+	  */
+	public int getZZ_AD_UserTo_ID();
+
+	public org.compiere.model.I_AD_User getZZ_AD_UserTo() throws RuntimeException;
 
     /** Column name ZZ_AllowLineManageApproved */
     public static final String COLUMNNAME_ZZ_AllowLineManageApproved = "ZZ_AllowLineManageApproved";

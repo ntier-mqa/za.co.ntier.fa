@@ -32,7 +32,7 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250402L;
+	private static final long serialVersionUID = 20250407L;
 
     /** Standard Constructor */
     public X_ZZ_AssetTransfer (Properties ctx, int ZZ_AssetTransfer_ID, String trxName)
@@ -42,7 +42,6 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
         {
 			setDateAcct (new Timestamp( System.currentTimeMillis() ));
 // @#Date@
-			setM_LocatorTo_ID (0);
 			setZZ_AllowLineManageApproved (true);
 // Y
 			setZZ_AllowSnrAdminFinanceApproved (false);
@@ -59,7 +58,6 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
         {
 			setDateAcct (new Timestamp( System.currentTimeMillis() ));
 // @#Date@
-			setM_LocatorTo_ID (0);
 			setZZ_AllowLineManageApproved (true);
 // Y
 			setZZ_AllowSnrAdminFinanceApproved (false);
@@ -76,7 +74,6 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
         {
 			setDateAcct (new Timestamp( System.currentTimeMillis() ));
 // @#Date@
-			setM_LocatorTo_ID (0);
 			setZZ_AllowLineManageApproved (true);
 // Y
 			setZZ_AllowSnrAdminFinanceApproved (false);
@@ -93,7 +90,6 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
         {
 			setDateAcct (new Timestamp( System.currentTimeMillis() ));
 // @#Date@
-			setM_LocatorTo_ID (0);
 			setZZ_AllowLineManageApproved (true);
 // Y
 			setZZ_AllowSnrAdminFinanceApproved (false);
@@ -129,6 +125,34 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
         .append(get_ID()).append("]");
       return sb.toString();
     }
+
+	public org.compiere.model.I_AD_User getAD_User() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getAD_User_ID(), get_TrxName());
+	}
+
+	/** Set User/Contact.
+		@param AD_User_ID User within the system - Internal or Business Partner Contact
+	*/
+	public void setAD_User_ID (int AD_User_ID)
+	{
+		if (AD_User_ID < 1)
+			set_Value (COLUMNNAME_AD_User_ID, null);
+		else
+			set_Value (COLUMNNAME_AD_User_ID, Integer.valueOf(AD_User_ID));
+	}
+
+	/** Get User/Contact.
+		@return User within the system - Internal or Business Partner Contact
+	  */
+	public int getAD_User_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_AD_User_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
 
 	public org.compiere.model.I_A_Asset getA_Asset() throws RuntimeException
 	{
@@ -233,9 +257,9 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 		return ii.intValue();
 	}
 
-	public I_M_Locator getM_LocatorTo() throws RuntimeException
+	public org.compiere.model.I_M_Locator getM_LocatorTo() throws RuntimeException
 	{
-		return (I_M_Locator)MTable.get(getCtx(), I_M_Locator.Table_ID)
+		return (org.compiere.model.I_M_Locator)MTable.get(getCtx(), org.compiere.model.I_M_Locator.Table_ID)
 			.getPO(getM_LocatorTo_ID(), get_TrxName());
 	}
 
@@ -289,6 +313,62 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 		return ii.intValue();
 	}
 
+	public org.compiere.model.I_M_Warehouse getM_WarehouseTo() throws RuntimeException
+	{
+		return (org.compiere.model.I_M_Warehouse)MTable.get(getCtx(), org.compiere.model.I_M_Warehouse.Table_ID)
+			.getPO(getM_WarehouseTo_ID(), get_TrxName());
+	}
+
+	/** Set Warehouse To.
+		@param M_WarehouseTo_ID To Storage Warehouse and Service Point
+	*/
+	public void setM_WarehouseTo_ID (int M_WarehouseTo_ID)
+	{
+		if (M_WarehouseTo_ID < 1)
+			set_Value (COLUMNNAME_M_WarehouseTo_ID, null);
+		else
+			set_Value (COLUMNNAME_M_WarehouseTo_ID, Integer.valueOf(M_WarehouseTo_ID));
+	}
+
+	/** Get Warehouse To.
+		@return To Storage Warehouse and Service Point
+	  */
+	public int getM_WarehouseTo_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_M_WarehouseTo_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public org.compiere.model.I_M_Warehouse getM_Warehouse() throws RuntimeException
+	{
+		return (org.compiere.model.I_M_Warehouse)MTable.get(getCtx(), org.compiere.model.I_M_Warehouse.Table_ID)
+			.getPO(getM_Warehouse_ID(), get_TrxName());
+	}
+
+	/** Set Warehouse.
+		@param M_Warehouse_ID Storage Warehouse and Service Point
+	*/
+	public void setM_Warehouse_ID (int M_Warehouse_ID)
+	{
+		if (M_Warehouse_ID < 1)
+			set_Value (COLUMNNAME_M_Warehouse_ID, null);
+		else
+			set_Value (COLUMNNAME_M_Warehouse_ID, Integer.valueOf(M_Warehouse_ID));
+	}
+
+	/** Get Warehouse.
+		@return Storage Warehouse and Service Point
+	  */
+	public int getM_Warehouse_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_M_Warehouse_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	/** Set Search Key.
 		@param Value Search key for the record in the format required - must be unique
 	*/
@@ -303,6 +383,34 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 	public String getValue()
 	{
 		return (String)get_Value(COLUMNNAME_Value);
+	}
+
+	public org.compiere.model.I_AD_User getZZ_AD_UserTo() throws RuntimeException
+	{
+		return (org.compiere.model.I_AD_User)MTable.get(getCtx(), org.compiere.model.I_AD_User.Table_ID)
+			.getPO(getZZ_AD_UserTo_ID(), get_TrxName());
+	}
+
+	/** Set User/Contact To.
+		@param ZZ_AD_UserTo_ID User within the system - Internal or Business Partner Contact
+	*/
+	public void setZZ_AD_UserTo_ID (int ZZ_AD_UserTo_ID)
+	{
+		if (ZZ_AD_UserTo_ID < 1)
+			set_Value (COLUMNNAME_ZZ_AD_UserTo_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZ_AD_UserTo_ID, Integer.valueOf(ZZ_AD_UserTo_ID));
+	}
+
+	/** Get User/Contact To.
+		@return User within the system - Internal or Business Partner Contact
+	  */
+	public int getZZ_AD_UserTo_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZ_AD_UserTo_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Allow Line Manage Approved.
