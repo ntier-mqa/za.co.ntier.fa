@@ -658,21 +658,6 @@ public interface I_A_Asset
 
 	public org.compiere.model.I_M_Product getM_Product() throws RuntimeException;
 
-    /** Column name M_Warehouse_ID */
-    public static final String COLUMNNAME_M_Warehouse_ID = "M_Warehouse_ID";
-
-	/** Set Warehouse.
-	  * Storage Warehouse and Service Point
-	  */
-	public void setM_Warehouse_ID (int M_Warehouse_ID);
-
-	/** Get Warehouse.
-	  * Storage Warehouse and Service Point
-	  */
-	public int getM_Warehouse_ID();
-
-	public org.compiere.model.I_M_Warehouse getM_Warehouse() throws RuntimeException;
-
     /** Column name ManufacturedYear */
     public static final String COLUMNNAME_ManufacturedYear = "ManufacturedYear";
 
@@ -862,6 +847,24 @@ public interface I_A_Asset
 	  * Version Number
 	  */
 	public String getVersionNo();
+
+    /** Column name ZZAssetLocation_ID */
+    public static final String COLUMNNAME_ZZAssetLocation_ID = "ZZAssetLocation_ID";
+
+	/** Set Asset Location	  */
+	public void setZZAssetLocation_ID (int ZZAssetLocation_ID);
+
+	/** Get Asset Location	  */
+	public int getZZAssetLocation_ID();
+
+    /** Column name ZZAssetRegion_ID */
+    public static final String COLUMNNAME_ZZAssetRegion_ID = "ZZAssetRegion_ID";
+
+	/** Set Asset Region	  */
+	public void setZZAssetRegion_ID (int ZZAssetRegion_ID);
+
+	/** Get Asset Region	  */
+	public int getZZAssetRegion_ID();
 
     /** Column name ZZ_ManufacturedDate */
     public static final String COLUMNNAME_ZZ_ManufacturedDate = "ZZ_ManufacturedDate";

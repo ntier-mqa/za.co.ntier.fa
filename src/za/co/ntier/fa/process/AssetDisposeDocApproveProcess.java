@@ -4,6 +4,8 @@ import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAssetDisposed;
 import org.compiere.model.X_A_Asset_Disposed;
 import org.compiere.process.DocAction;
+import org.compiere.process.ProcessInfo;
+import org.compiere.wf.MWorkflow;
 
 import za.co.ntier.fa.model.MZZAssetDisposal;
 
@@ -16,15 +18,8 @@ public class AssetDisposeDocApproveProcess extends BaseDocApproveProcess<MZZAsse
 	}
 	
 	@Override
-	protected String doIt() throws Exception {
-		String resultMsg = null;
-		resultMsg = super.doIt();
-		if (resultMsg == null && IDocApprove.ZZ_DOCSTATUS_Completed.equals(docApprove.getZZ_DocStatus())) {
-			disposeAsset();
-			return null;
-		}else {
-			return resultMsg;
-		}
+	protected void doLogic(){
+		disposeAsset();
 	}
 	
 	private void disposeAsset() {
@@ -35,9 +30,9 @@ public class AssetDisposeDocApproveProcess extends BaseDocApproveProcess<MZZAsse
 		assetDisposed.saveEx();
 		poObj.setA_Asset_Disposed_ID(assetDisposed.getA_Asset_Disposed_ID());
 		poObj.saveEx();
-		boolean success = assetDisposed.processIt(DocAction.ACTION_Complete);
-		if (!success) {
-			throw new AdempiereException(assetDisposed.getProcessMsg()); 
+		ProcessInfo pi = MWorkflow.runDocumentActionWorkflow(assetDisposed, DocAction.ACTION_Complete);
+		if (pi.isError()) {
+			throw new AdempiereException(pi.getSummary()); 
 		}
 	}
 }

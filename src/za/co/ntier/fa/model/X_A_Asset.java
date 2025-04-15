@@ -27,14 +27,14 @@ import org.compiere.util.Env;
 /** Generated Model for A_Asset
  *  @author iDempiere (generated)
  *  @version Release 12 - $Id$ */
-// get interfaces to use on wrapper only
+
 public class X_A_Asset extends PO implements I_A_Asset, I_Persistent
 {
 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250407L;
+	private static final long serialVersionUID = 20250415L;
 
     /** Standard Constructor */
     public X_A_Asset (Properties ctx, int A_Asset_ID, String trxName)
@@ -1170,34 +1170,6 @@ public class X_A_Asset extends PO implements I_A_Asset, I_Persistent
 		return ii.intValue();
 	}
 
-	public org.compiere.model.I_M_Warehouse getM_Warehouse() throws RuntimeException
-	{
-		return (org.compiere.model.I_M_Warehouse)MTable.get(getCtx(), org.compiere.model.I_M_Warehouse.Table_ID)
-			.getPO(getM_Warehouse_ID(), get_TrxName());
-	}
-
-	/** Set Warehouse.
-		@param M_Warehouse_ID Storage Warehouse and Service Point
-	*/
-	public void setM_Warehouse_ID (int M_Warehouse_ID)
-	{
-		if (M_Warehouse_ID < 1)
-			set_Value (COLUMNNAME_M_Warehouse_ID, null);
-		else
-			set_Value (COLUMNNAME_M_Warehouse_ID, Integer.valueOf(M_Warehouse_ID));
-	}
-
-	/** Get Warehouse.
-		@return Storage Warehouse and Service Point
-	  */
-	public int getM_Warehouse_ID()
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_M_Warehouse_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
 	/** Set Manufactured Year.
 		@param ManufacturedYear Manufactured Year
 	*/
@@ -1450,6 +1422,48 @@ public class X_A_Asset extends PO implements I_A_Asset, I_Persistent
 	public String getVersionNo()
 	{
 		return (String)get_Value(COLUMNNAME_VersionNo);
+	}
+
+	/** Set Asset Location.
+		@param ZZAssetLocation_ID Asset Location
+	*/
+	public void setZZAssetLocation_ID (int ZZAssetLocation_ID)
+	{
+		if (ZZAssetLocation_ID < 1)
+			set_Value (COLUMNNAME_ZZAssetLocation_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZAssetLocation_ID, Integer.valueOf(ZZAssetLocation_ID));
+	}
+
+	/** Get Asset Location.
+		@return Asset Location	  */
+	public int getZZAssetLocation_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZAssetLocation_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	/** Set Asset Region.
+		@param ZZAssetRegion_ID Asset Region
+	*/
+	public void setZZAssetRegion_ID (int ZZAssetRegion_ID)
+	{
+		if (ZZAssetRegion_ID < 1)
+			set_Value (COLUMNNAME_ZZAssetRegion_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZAssetRegion_ID, Integer.valueOf(ZZAssetRegion_ID));
+	}
+
+	/** Get Asset Region.
+		@return Asset Region	  */
+	public int getZZAssetRegion_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZAssetRegion_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	/** Set Manufactured Date.

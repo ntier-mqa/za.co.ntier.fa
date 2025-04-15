@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="za.co.ntier.fa.osgi.component.MqaAnnotationEventManager">
+   <service>
+      <provide interface="za.co.ntier.fa.osgi.component.MqaAnnotationEventManager"/>
+   </service>
+   <implementation class="za.co.ntier.fa.osgi.component.MqaAnnotationEventManager"/>
+</scr:component>

@@ -3,21 +3,27 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Ntier Fix Asset
 Bundle-SymbolicName: za.co.ntier.fa
 Bundle-Version: 1.0.0.qualifier
+Export-Package: za.co.ntier.fa.model
 Bundle-Vendor: Ntier
 Automatic-Module-Name: za.co.ntier.fa
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: org.adempiere.base,
  org.adempiere.base.annotation,
+ org.adempiere.base.event.annotations,
+ org.adempiere.base.event.annotations.po,
  org.adempiere.exceptions,
  org.adempiere.model,
  org.adempiere.util,
  org.compiere.model,
  org.compiere.process,
  org.compiere.util,
+ org.compiere.wf,
  org.idempiere.fa.service.api,
+ org.osgi.service.event;version="[1.4.0,2.0.0)",
  za.ntier.utils
 Service-Component: OSGI-INF/za.co.ntier.fa.osgi.component.MQAFAAnnotationModelFactory.xml,
  OSGI-INF/za.co.ntier.fa.osgi.component.MQAFADepreciationMethodFactory.xml,
  OSGI-INF/za.co.ntier.fa.osgi.component.MQAFAnnotationProcessFactory.xml,
+ OSGI-INF/za.co.ntier.fa.osgi.component.MqaAnnotationEventManager.xml,
  OSGI-INF/za.co.ntier.fa.osgi.component.MqaFAAnnotationColumnCalloutFactory.xml

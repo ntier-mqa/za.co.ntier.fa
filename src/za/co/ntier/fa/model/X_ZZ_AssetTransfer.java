@@ -32,7 +32,7 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250407L;
+	private static final long serialVersionUID = 20250415L;
 
     /** Standard Constructor */
     public X_ZZ_AssetTransfer (Properties ctx, int ZZ_AssetTransfer_ID, String trxName)
@@ -257,118 +257,6 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 		return ii.intValue();
 	}
 
-	public org.compiere.model.I_M_Locator getM_LocatorTo() throws RuntimeException
-	{
-		return (org.compiere.model.I_M_Locator)MTable.get(getCtx(), org.compiere.model.I_M_Locator.Table_ID)
-			.getPO(getM_LocatorTo_ID(), get_TrxName());
-	}
-
-	/** Set Locator To.
-		@param M_LocatorTo_ID Location inventory is moved to
-	*/
-	public void setM_LocatorTo_ID (int M_LocatorTo_ID)
-	{
-		if (M_LocatorTo_ID < 1)
-			set_Value (COLUMNNAME_M_LocatorTo_ID, null);
-		else
-			set_Value (COLUMNNAME_M_LocatorTo_ID, Integer.valueOf(M_LocatorTo_ID));
-	}
-
-	/** Get Locator To.
-		@return Location inventory is moved to
-	  */
-	public int getM_LocatorTo_ID()
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_M_LocatorTo_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
-	public I_M_Locator getM_Locator() throws RuntimeException
-	{
-		return (I_M_Locator)MTable.get(getCtx(), I_M_Locator.Table_ID)
-			.getPO(getM_Locator_ID(), get_TrxName());
-	}
-
-	/** Set Locator.
-		@param M_Locator_ID Warehouse Locator
-	*/
-	public void setM_Locator_ID (int M_Locator_ID)
-	{
-		if (M_Locator_ID < 1)
-			set_Value (COLUMNNAME_M_Locator_ID, null);
-		else
-			set_Value (COLUMNNAME_M_Locator_ID, Integer.valueOf(M_Locator_ID));
-	}
-
-	/** Get Locator.
-		@return Warehouse Locator
-	  */
-	public int getM_Locator_ID()
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_M_Locator_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
-	public org.compiere.model.I_M_Warehouse getM_WarehouseTo() throws RuntimeException
-	{
-		return (org.compiere.model.I_M_Warehouse)MTable.get(getCtx(), org.compiere.model.I_M_Warehouse.Table_ID)
-			.getPO(getM_WarehouseTo_ID(), get_TrxName());
-	}
-
-	/** Set Warehouse To.
-		@param M_WarehouseTo_ID To Storage Warehouse and Service Point
-	*/
-	public void setM_WarehouseTo_ID (int M_WarehouseTo_ID)
-	{
-		if (M_WarehouseTo_ID < 1)
-			set_Value (COLUMNNAME_M_WarehouseTo_ID, null);
-		else
-			set_Value (COLUMNNAME_M_WarehouseTo_ID, Integer.valueOf(M_WarehouseTo_ID));
-	}
-
-	/** Get Warehouse To.
-		@return To Storage Warehouse and Service Point
-	  */
-	public int getM_WarehouseTo_ID()
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_M_WarehouseTo_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
-	public org.compiere.model.I_M_Warehouse getM_Warehouse() throws RuntimeException
-	{
-		return (org.compiere.model.I_M_Warehouse)MTable.get(getCtx(), org.compiere.model.I_M_Warehouse.Table_ID)
-			.getPO(getM_Warehouse_ID(), get_TrxName());
-	}
-
-	/** Set Warehouse.
-		@param M_Warehouse_ID Storage Warehouse and Service Point
-	*/
-	public void setM_Warehouse_ID (int M_Warehouse_ID)
-	{
-		if (M_Warehouse_ID < 1)
-			set_Value (COLUMNNAME_M_Warehouse_ID, null);
-		else
-			set_Value (COLUMNNAME_M_Warehouse_ID, Integer.valueOf(M_Warehouse_ID));
-	}
-
-	/** Get Warehouse.
-		@return Storage Warehouse and Service Point
-	  */
-	public int getM_Warehouse_ID()
-	{
-		Integer ii = (Integer)get_Value(COLUMNNAME_M_Warehouse_ID);
-		if (ii == null)
-			 return 0;
-		return ii.intValue();
-	}
-
 	/** Set Search Key.
 		@param Value Search key for the record in the format required - must be unique
 	*/
@@ -383,6 +271,114 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 	public String getValue()
 	{
 		return (String)get_Value(COLUMNNAME_Value);
+	}
+
+	public I_ZZAssetLocation getZZAssetLocationTo() throws RuntimeException
+	{
+		return (I_ZZAssetLocation)MTable.get(getCtx(), I_ZZAssetLocation.Table_ID)
+			.getPO(getZZAssetLocationTo_ID(), get_TrxName());
+	}
+
+	/** Set Asset Location To.
+		@param ZZAssetLocationTo_ID Asset Location To
+	*/
+	public void setZZAssetLocationTo_ID (int ZZAssetLocationTo_ID)
+	{
+		if (ZZAssetLocationTo_ID < 1)
+			set_Value (COLUMNNAME_ZZAssetLocationTo_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZAssetLocationTo_ID, Integer.valueOf(ZZAssetLocationTo_ID));
+	}
+
+	/** Get Asset Location To.
+		@return Asset Location To	  */
+	public int getZZAssetLocationTo_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZAssetLocationTo_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_ZZAssetLocation getZZAssetLocation() throws RuntimeException
+	{
+		return (I_ZZAssetLocation)MTable.get(getCtx(), I_ZZAssetLocation.Table_ID)
+			.getPO(getZZAssetLocation_ID(), get_TrxName());
+	}
+
+	/** Set Asset Location.
+		@param ZZAssetLocation_ID Asset Location
+	*/
+	public void setZZAssetLocation_ID (int ZZAssetLocation_ID)
+	{
+		if (ZZAssetLocation_ID < 1)
+			set_Value (COLUMNNAME_ZZAssetLocation_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZAssetLocation_ID, Integer.valueOf(ZZAssetLocation_ID));
+	}
+
+	/** Get Asset Location.
+		@return Asset Location	  */
+	public int getZZAssetLocation_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZAssetLocation_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_ZZAssetRegion getZZAssetRegionTo() throws RuntimeException
+	{
+		return (I_ZZAssetRegion)MTable.get(getCtx(), I_ZZAssetRegion.Table_ID)
+			.getPO(getZZAssetRegionTo_ID(), get_TrxName());
+	}
+
+	/** Set Asset Region To.
+		@param ZZAssetRegionTo_ID Asset Region To
+	*/
+	public void setZZAssetRegionTo_ID (int ZZAssetRegionTo_ID)
+	{
+		if (ZZAssetRegionTo_ID < 1)
+			set_Value (COLUMNNAME_ZZAssetRegionTo_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZAssetRegionTo_ID, Integer.valueOf(ZZAssetRegionTo_ID));
+	}
+
+	/** Get Asset Region To.
+		@return Asset Region To	  */
+	public int getZZAssetRegionTo_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZAssetRegionTo_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_ZZAssetRegion getZZAssetRegion() throws RuntimeException
+	{
+		return (I_ZZAssetRegion)MTable.get(getCtx(), I_ZZAssetRegion.Table_ID)
+			.getPO(getZZAssetRegion_ID(), get_TrxName());
+	}
+
+	/** Set Asset Region.
+		@param ZZAssetRegion_ID Asset Region
+	*/
+	public void setZZAssetRegion_ID (int ZZAssetRegion_ID)
+	{
+		if (ZZAssetRegion_ID < 1)
+			set_Value (COLUMNNAME_ZZAssetRegion_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZAssetRegion_ID, Integer.valueOf(ZZAssetRegion_ID));
+	}
+
+	/** Get Asset Region.
+		@return Asset Region	  */
+	public int getZZAssetRegion_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZAssetRegion_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
 	}
 
 	public org.compiere.model.I_AD_User getZZ_AD_UserTo() throws RuntimeException

@@ -11,6 +11,8 @@ public interface IDocApprove {
 	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
+	/** Submit to Line Manager = SU */
+	public static final String ZZ_DOCACTION_SubmitToSnrAdminFinance = "SS";
 	
 	/** Approved = AP */
 	public static final String ZZ_DOCSTATUS_Approved = "AP";

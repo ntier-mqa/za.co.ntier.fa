@@ -10,6 +10,7 @@ import org.compiere.model.PO;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
+import org.compiere.util.Util;
 
 import za.ntier.utils.Notifications;
 
@@ -29,6 +30,9 @@ public class BaseDocApproveProcess<T extends PO> extends SvrProcess{
 		now = new Timestamp(System.currentTimeMillis());
 	}
 	
+	/**
+	 * overrider on child call docApprove = poObj to help docApprove can use direct interface on (T)poObj faster than POWrapper
+	 */
 	protected void initDocApproveObj() {
 		docApprove = POWrapper.create(poObj, IDocApprove.class);
 	}
@@ -36,6 +40,24 @@ public class BaseDocApproveProcess<T extends PO> extends SvrProcess{
 	protected T poObj;
 	protected IDocApprove docApprove;
 	protected Timestamp now = null;
+	
+	protected void doSubmitDocForSnrAdminFinanceManage(boolean isBypassLineManage) {
+		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_InProgress);
+		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove);
+		docApprove.setZZ_Date_LM_Approved(now);
+		if (isBypassLineManage && docApprove.getZZ_Date_Submitted() == null)
+			docApprove.setZZ_Date_Submitted(now);
+			
+		Notifications.sendNotificationToRole(
+				IDocApprove.SNR_ADMIN_FIN_ROLE_ID,
+				getRecord_ID(),
+				docApprove.getSubject(),
+				docApprove.getMessage(),
+				docApprove.getMessageID(),
+				getCtx(),
+				get_TrxName(),
+				getTable_ID());
+	}
 	
 	protected void doSubmitDocForLineManage(){
 		if (docApprove.getLine_Manager_ID() <= 0)
@@ -61,18 +83,7 @@ public class BaseDocApproveProcess<T extends PO> extends SvrProcess{
 	
 	protected void doLineManageApprove() {
 		if("Y".equals(pApproveRejLM)){
-			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_InProgress);
-			docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove);
-			docApprove.setZZ_Date_LM_Approved(now);
-			Notifications.sendNotificationToRole(
-					IDocApprove.SNR_ADMIN_FIN_ROLE_ID,
-					getRecord_ID(),
-					docApprove.getSubject(),
-					docApprove.getMessage(),
-					docApprove.getMessageID(),
-					getCtx(),
-					get_TrxName(),
-					getTable_ID());
+			doSubmitDocForSnrAdminFinanceManage(false);
 		}else{
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByLM);
 			docApprove.setZZ_Date_Not_Approved_by_LM(now);
@@ -150,8 +161,13 @@ public class BaseDocApproveProcess<T extends PO> extends SvrProcess{
 		
 	}
 	
+	protected void validateData() {
+		// overrider on child to implement validation
+	}
+	
 	@Override
 	protected String doIt() throws Exception {
+		validateData();
 		String currentDocAction = docApprove.getZZ_DocAction();
 		String currentDocStatus = docApprove.getZZ_DocStatus();
 		if(docApprove.isZZ_AllowLineManageApproved() && 
@@ -164,7 +180,10 @@ public class BaseDocApproveProcess<T extends PO> extends SvrProcess{
 				IDocApprove.ZZ_DOCSTATUS_Submitted.equals(currentDocStatus)) {
 			
 			doLineManageApprove();
-			
+		}else if(!docApprove.isZZ_AllowLineManageApproved() &&
+				docApprove.isZZ_AllowSnrAdminFinanceApproved() &&
+				IDocApprove.ZZ_DOCACTION_SubmitToLineManager.equals(currentDocAction)) {
+			doSubmitDocForSnrAdminFinanceManage(true);
 		}else if(docApprove.isZZ_AllowSnrAdminFinanceApproved() &&
 				IDocApprove.ZZ_DOCACTION_FinalApprovalDoNotApprove.equals(currentDocAction) && 
 				IDocApprove.ZZ_DOCSTATUS_InProgress.equals(currentDocStatus)) {
@@ -181,6 +200,13 @@ public class BaseDocApproveProcess<T extends PO> extends SvrProcess{
 		doFinalDocState(currentDocAction);
 		poObj.saveEx();
 
+		if (!Util.isEmpty(docApprove.getZZ_FinalWorkflowStateValue(), true) && docApprove.getZZ_FinalWorkflowStateValue().equals(docApprove.getZZ_DocStatus())) {
+			doLogic();
+		}
 		return null;
+	}
+	
+	protected void doLogic() {
+		// overrider on child to implement logic when reach to FinalWorkflowState (approve/complete)
 	}
 }

@@ -15,22 +15,15 @@ public class AssetTrasferDocApproveProcess extends BaseDocApproveProcess<MZZAsse
 	}
 	
 	@Override
-	protected String doIt() throws Exception {
-		String resultMsg = null;
-		resultMsg = super.doIt();
-		if (resultMsg == null && IDocApprove.ZZ_DOCSTATUS_Approved.equals(docApprove.getZZ_DocStatus())) {
-			transferAsset();
-			return null;
-		} else {
-			return resultMsg;
-		}
+	protected void doLogic(){
+		transferAsset();
 	}
 
 	private void transferAsset() {
 		MAsset asset = new MAsset(getCtx(), poObj.getA_Asset_ID(), get_TrxName());
 		I_A_Asset assetWrapper = POWrapper.create(asset, I_A_Asset.class);
-		assetWrapper.setM_Locator_ID(poObj.getM_LocatorTo_ID());
-		assetWrapper.setM_Warehouse_ID(poObj.getM_WarehouseTo_ID());
+		assetWrapper.setZZAssetLocation_ID(poObj.getZZAssetLocationTo_ID());
+		assetWrapper.setZZAssetRegion_ID(poObj.getZZAssetRegionTo_ID());
 		assetWrapper.setAD_User_ID(poObj.getZZ_AD_UserTo_ID());
 		asset.saveEx();
 	}

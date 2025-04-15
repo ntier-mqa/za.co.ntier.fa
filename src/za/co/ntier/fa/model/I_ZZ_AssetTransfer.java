@@ -173,66 +173,6 @@ public interface I_ZZ_AssetTransfer
 
 	public org.compiere.model.I_AD_User getLine_Manager() throws RuntimeException;
 
-    /** Column name M_LocatorTo_ID */
-    public static final String COLUMNNAME_M_LocatorTo_ID = "M_LocatorTo_ID";
-
-	/** Set Locator To.
-	  * Location inventory is moved to
-	  */
-	public void setM_LocatorTo_ID (int M_LocatorTo_ID);
-
-	/** Get Locator To.
-	  * Location inventory is moved to
-	  */
-	public int getM_LocatorTo_ID();
-
-	public org.compiere.model.I_M_Locator getM_LocatorTo() throws RuntimeException;
-
-    /** Column name M_Locator_ID */
-    public static final String COLUMNNAME_M_Locator_ID = "M_Locator_ID";
-
-	/** Set Locator.
-	  * Warehouse Locator
-	  */
-	public void setM_Locator_ID (int M_Locator_ID);
-
-	/** Get Locator.
-	  * Warehouse Locator
-	  */
-	public int getM_Locator_ID();
-
-	public I_M_Locator getM_Locator() throws RuntimeException;
-
-    /** Column name M_WarehouseTo_ID */
-    public static final String COLUMNNAME_M_WarehouseTo_ID = "M_WarehouseTo_ID";
-
-	/** Set Warehouse To.
-	  * To Storage Warehouse and Service Point
-	  */
-	public void setM_WarehouseTo_ID (int M_WarehouseTo_ID);
-
-	/** Get Warehouse To.
-	  * To Storage Warehouse and Service Point
-	  */
-	public int getM_WarehouseTo_ID();
-
-	public org.compiere.model.I_M_Warehouse getM_WarehouseTo() throws RuntimeException;
-
-    /** Column name M_Warehouse_ID */
-    public static final String COLUMNNAME_M_Warehouse_ID = "M_Warehouse_ID";
-
-	/** Set Warehouse.
-	  * Storage Warehouse and Service Point
-	  */
-	public void setM_Warehouse_ID (int M_Warehouse_ID);
-
-	/** Get Warehouse.
-	  * Storage Warehouse and Service Point
-	  */
-	public int getM_Warehouse_ID();
-
-	public org.compiere.model.I_M_Warehouse getM_Warehouse() throws RuntimeException;
-
     /** Column name Updated */
     public static final String COLUMNNAME_Updated = "Updated";
 
@@ -261,6 +201,50 @@ public interface I_ZZ_AssetTransfer
 	  * Search key for the record in the format required - must be unique
 	  */
 	public String getValue();
+
+    /** Column name ZZAssetLocationTo_ID */
+    public static final String COLUMNNAME_ZZAssetLocationTo_ID = "ZZAssetLocationTo_ID";
+
+	/** Set Asset Location To	  */
+	public void setZZAssetLocationTo_ID (int ZZAssetLocationTo_ID);
+
+	/** Get Asset Location To	  */
+	public int getZZAssetLocationTo_ID();
+
+	public I_ZZAssetLocation getZZAssetLocationTo() throws RuntimeException;
+
+    /** Column name ZZAssetLocation_ID */
+    public static final String COLUMNNAME_ZZAssetLocation_ID = "ZZAssetLocation_ID";
+
+	/** Set Asset Location	  */
+	public void setZZAssetLocation_ID (int ZZAssetLocation_ID);
+
+	/** Get Asset Location	  */
+	public int getZZAssetLocation_ID();
+
+	public I_ZZAssetLocation getZZAssetLocation() throws RuntimeException;
+
+    /** Column name ZZAssetRegionTo_ID */
+    public static final String COLUMNNAME_ZZAssetRegionTo_ID = "ZZAssetRegionTo_ID";
+
+	/** Set Asset Region To	  */
+	public void setZZAssetRegionTo_ID (int ZZAssetRegionTo_ID);
+
+	/** Get Asset Region To	  */
+	public int getZZAssetRegionTo_ID();
+
+	public I_ZZAssetRegion getZZAssetRegionTo() throws RuntimeException;
+
+    /** Column name ZZAssetRegion_ID */
+    public static final String COLUMNNAME_ZZAssetRegion_ID = "ZZAssetRegion_ID";
+
+	/** Set Asset Region	  */
+	public void setZZAssetRegion_ID (int ZZAssetRegion_ID);
+
+	/** Get Asset Region	  */
+	public int getZZAssetRegion_ID();
+
+	public I_ZZAssetRegion getZZAssetRegion() throws RuntimeException;
 
     /** Column name ZZ_AD_UserTo_ID */
     public static final String COLUMNNAME_ZZ_AD_UserTo_ID = "ZZ_AD_UserTo_ID";
