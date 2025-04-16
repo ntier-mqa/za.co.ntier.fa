@@ -448,6 +448,19 @@ public interface I_A_Depreciation_Exp
 	/** Get Use Life - Months (fiscal)	  */
 	public int getUseLifeMonths_F();
 
+    /** Column name ZZMonthlyRate */
+    public static final String COLUMNNAME_ZZMonthlyRate = "ZZMonthlyRate";
+
+	/** Set Monthly Rate.
+	  * Deprecite Monthly Rate
+	  */
+	public void setZZMonthlyRate (BigDecimal ZZMonthlyRate);
+
+	/** Get Monthly Rate.
+	  * Deprecite Monthly Rate
+	  */
+	public BigDecimal getZZMonthlyRate();
+
     /** Column name ZZ_DailyRate */
     public static final String COLUMNNAME_ZZ_DailyRate = "ZZ_DailyRate";
 

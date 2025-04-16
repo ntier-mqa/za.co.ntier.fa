@@ -11,6 +11,7 @@ import org.compiere.util.Msg;
 import org.osgi.service.event.Event;
 
 import za.co.ntier.fa.depreciation.MqaDepreciationMethod;
+import za.co.ntier.fa.model.I_A_Depreciation_Exp;
 
 @EventTopicDelegate
 @ModelEventTopic(modelClass = MDepreciationExp.class)
@@ -23,6 +24,8 @@ public class ModelDepreciationExpHandle extends ModelEventDelegate<MDepreciation
 	public void beforeNewMDepreciationExp(){
 		if (MqaDepreciationMethod.saveDailyDepreciateRate.get() == null)
 			throw new AdempiereException(Msg.getMsg(Env.getCtx(), "ZZ_AssetRevaluationDailyRateNotFound"));
-		getModel().set_ValueOfColumn(MqaDepreciationMethod.COLUMN_NAME_ZZ_DAILY_RATE, MqaDepreciationMethod.saveDailyDepreciateRate.get());
+		
+		getModel().set_ValueOfColumn(I_A_Depreciation_Exp.COLUMNNAME_ZZ_DailyRate, MqaDepreciationMethod.saveDailyDepreciateRate.get());
+		getModel().set_ValueOfColumn(I_A_Depreciation_Exp.COLUMNNAME_ZZMonthlyRate, MqaDepreciationMethod.saveMonthlyDepreciateRate.get());
 	}
 }

@@ -69,6 +69,11 @@ public class AssetRevaluationDocApproveProcess extends BaseDocApproveProcess<MZZ
 		}else {
 			dwf.setUseLifeYears(poObj.getUseLifeYears());
 			dwf.setUseLifeMonths(poObj.getUseLifeMonths());
+			dwf.setA_Life_Period(poObj.getUseLifeMonths());
+			
+			dwf.setUseLifeYears_F(poObj.getUseLifeYears());
+			dwf.setUseLifeMonths_F(poObj.getUseLifeMonths());
+			dwf.setA_Life_Period_F(poObj.getUseLifeMonths());
 		}
 
 		dwf.saveEx(get_TrxName());
