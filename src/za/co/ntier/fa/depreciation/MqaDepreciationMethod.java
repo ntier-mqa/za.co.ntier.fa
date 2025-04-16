@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import org.adempiere.exceptions.AdempiereException;
@@ -22,7 +23,7 @@ import za.co.ntier.fa.model.MZZAssetChange;
 
 public class MqaDepreciationMethod implements IDepreciationMethod {
 	// save to use at event handle to save to MDepreciationExp
-	public static final ThreadLocal<BigDecimal> activePeriodDailyDepreciateRate = new ThreadLocal<>();
+	public static final ThreadLocal<BigDecimal> saveDailyDepreciateRate = new ThreadLocal<>();
 	public static final BigDecimal monthsInYear = BigDecimal.valueOf(12);
 	public static final BigDecimal daysInYear = BigDecimal.valueOf(365);
 	public static final String COLUMN_NAME_ZZ_DAILY_RATE = "ZZ_DailyRate";
@@ -32,41 +33,36 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 
 	long periodsCount = 0;
 	/**
-	 * day start of use life (is in Service date)
+	 * day start of use life (is "in Service date")
+	 * to calculator days, detect number of period
 	 */
 	LocalDate dayStartOfLife;
 	/*
 	 * day end of use life
+	 * to calculator total days
 	 */
 	LocalDate dayEndOfLife;
 	/*
-	 * fist day of current account date (value on MDepreciationWorkfile)
+	 * latest time has change, it separate period to 2 part and need to use old and new rate to calculator depreciation
+	 * can be null in case no change from latest depreciated time
 	 */
-	LocalDate fisrtDayAcctDateWkf;
+	LocalDate changeDate;
 	/*
-	 * next month of account date (at start of month)
+	 * list of asset change on time not yet depreciated (max 2 item, one for amount other for use life)
 	 */
-	LocalDate fisrtDayNextMonthAcctDateWkf;
-	/*
-	 * latest change asset, can be null
-	 */
-	LocalDate lastDateEffectChange;
-	/*
-	 * list of asset change history (max 2 item)
-	 */
-	List<MAssetChange> effectChanges;
+	List<MAssetChange> activeAssetChanges;
 	/*
 	 * get from latest depreciation, can be null
 	 * in case change happen on first period, first range use rate calculator from old value (get from first asset change)
 	 */
-	BigDecimal dailyDepreciateRateForOldAssetValue = null;
+	BigDecimal dailyDepreciateRate = null;
 	/*
 	 * calculated daily rate for current build
 	 */
-	BigDecimal dailyDepreciateRateForNewAssetValue = null;
+	BigDecimal newDailyDepreciateRate = null;
 
 	/**
-	 * Accumulated depreciate to current calculator
+	 * to accumulated depreciation so can get remain amount each time calculator
 	 */
 	BigDecimal accumulatedDep = null;
 
@@ -115,86 +111,84 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 			init(depreciationDTO);
 		}
 
-		// remaining cost util this period
-		BigDecimal amountDepreciation = assetwk.getRemainingCost(accumulatedDep);
-
 		// (1) bring all remain cost to end period
 		if (depreciationDTO.period == periodsCount) {
-			return amountDepreciation;
+			return assetwk.getRemainingCost(accumulatedDep);
 		}
 
 		//(2) start and end date of period calculation
-		LocalDate startPeriodDate = null;
-		LocalDate endPeriodDate = null;
+		LocalDate dayStartOfPeriod = null;
+		LocalDate dayEndOfPeriod = null;
 
 		// day 1 of calculation period date, at first period it's start date
 		if (depreciationDTO.period == 1) {
-			startPeriodDate = dayStartOfLife;
+			dayStartOfPeriod = dayStartOfLife;
 		} else {
-			startPeriodDate = dayStartOfLife.plusMonths(depreciationDTO.period - 1).withDayOfMonth(1);
+			dayStartOfPeriod = dayStartOfLife.plusMonths(depreciationDTO.period - 1).with(TemporalAdjusters.firstDayOfMonth());
 		}
 
 		// always at day end of month because case last period already done above
-		endPeriodDate = startPeriodDate.withDayOfMonth(startPeriodDate.lengthOfMonth());
+		dayEndOfPeriod = dayStartOfPeriod.with(TemporalAdjusters.lastDayOfMonth());
 
 		//(2) days use previous daily rate and days use new daily rate
-		BigDecimal prevDailyRateDays = BigDecimal.ZERO;
-		BigDecimal currentDailyRateDays = BigDecimal.ZERO;
+		BigDecimal daysUseOldRate = BigDecimal.ZERO;
+		BigDecimal daysUseNewRate = BigDecimal.ZERO;
 
-		// change date at between current calculate period
-		if (lastDateEffectChange == null) {
-			if (startPeriodDate.getDayOfMonth() == 1) { // full month
-				currentDailyRateDays = averageDaysInMonth;
+		// hasn't change or calculator for period before change date so have date for old rate only
+		if (changeDate == null || dayEndOfPeriod.isBefore(changeDate)) {
+			if (dayStartOfPeriod.getDayOfMonth() == 1) { // full month
+				daysUseOldRate = averageDaysInMonth;
 			} else {
-            	currentDailyRateDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(startPeriodDate, endPeriodDate) + 1);
+				daysUseOldRate = BigDecimal.valueOf(ChronoUnit.DAYS.between(dayStartOfPeriod, dayEndOfPeriod) + 1);
             }
-		}else if (lastDateEffectChange.isBefore(startPeriodDate) || lastDateEffectChange.isEqual(startPeriodDate)){
-			if (startPeriodDate.getDayOfMonth() == 1) { // full month
-				currentDailyRateDays = averageDaysInMonth;
+		// calculator for period after change date so have date for new rate only
+		}else if (dayStartOfPeriod.isAfter(changeDate) || changeDate.isEqual(dayStartOfPeriod)){
+			if (dayStartOfPeriod.getDayOfMonth() == 1) { // full month, end partial month already done at (1)
+				daysUseNewRate = averageDaysInMonth;
 			} else {
-            	// not happen
+				daysUseNewRate = BigDecimal.valueOf(ChronoUnit.DAYS.between(dayStartOfPeriod, dayEndOfPeriod) + 1);
             }
-		}else if (lastDateEffectChange.isAfter(endPeriodDate)){
-			if (startPeriodDate.getDayOfMonth() == 1) { // full month
-				prevDailyRateDays = averageDaysInMonth;
-			} else {
-            	prevDailyRateDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(startPeriodDate, endPeriodDate) + 1);
-            }
-		}else if ((lastDateEffectChange.isAfter(startPeriodDate) && lastDateEffectChange.isBefore(endPeriodDate)) ||
-				lastDateEffectChange.isEqual(endPeriodDate)){// new change split current period
-			prevDailyRateDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(startPeriodDate, lastDateEffectChange));
-			currentDailyRateDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(lastDateEffectChange, endPeriodDate) + 1);
+		}else if ((dayStartOfPeriod.isBefore(changeDate) && dayEndOfPeriod.isAfter(changeDate)) ||
+				changeDate.isEqual(dayEndOfPeriod)){// new change split current period
+			daysUseOldRate = BigDecimal.valueOf(ChronoUnit.DAYS.between(dayStartOfPeriod, changeDate));
+			daysUseNewRate = BigDecimal.valueOf(ChronoUnit.DAYS.between(changeDate, dayEndOfPeriod) + 1);
 		}else {
 			// not happen, in case something change make this case happen then throw exception
 			throw new AdempiereException(Msg.getMsg(Env.getCtx(), "ZZ_AssetRevaluationChangeDateOutOfHandle"));
 		}
 		
+		// (3) amount use old and new rate
 		// can be zero when prevDailyRateDays is zero
-		BigDecimal prevDailyRateAmount = prevDailyRateDays.multiply(dailyDepreciateRateForOldAssetValue);
-
-		BigDecimal currentDailyRateAmount = BigDecimal.ZERO;
+		BigDecimal amountUseOldRate = daysUseOldRate.multiply(dailyDepreciateRate);
+		BigDecimal fullAmountPeriod = amountUseOldRate;
 		
-		if (dailyDepreciateRateForNewAssetValue == null && currentDailyRateDays.compareTo(BigDecimal.ZERO) > 0) {// new change split current period
-			BigDecimal remainAssetCost = assetwk.getRemainingCost(accumulatedDep.add(prevDailyRateAmount));//prevDailyRateAmount = zero when change date at end of prev month
+		// reach to new rate calculator it
+		if (newDailyDepreciateRate == null && daysUseNewRate.compareTo(BigDecimal.ZERO) > 0) {// new change split current period
+			BigDecimal remainAssetCost = assetwk.getRemainingCost(accumulatedDep.add(amountUseOldRate));//prevDailyRateAmount = zero when change date at end of prev month
 
-    		BigDecimal remainDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(lastDateEffectChange, dayEndOfLife) + 1);
+    		BigDecimal remainDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(changeDate, dayEndOfLife) + 1);
 
-    		dailyDepreciateRateForNewAssetValue = remainAssetCost.divide(remainDays, depreciationDTO.scale, RoundingMode.HALF_DOWN);
+    		newDailyDepreciateRate = remainAssetCost.divide(remainDays, depreciationDTO.scale, RoundingMode.HALF_DOWN);
 		}
 		
-		if (currentDailyRateDays.compareTo(BigDecimal.ZERO) > 0)
-			currentDailyRateAmount = currentDailyRateDays.multiply(dailyDepreciateRateForNewAssetValue);
+		// amount use new rate
+		if (daysUseNewRate.compareTo(BigDecimal.ZERO) > 0) {
+			BigDecimal amountUseNewRate = daysUseNewRate.multiply(newDailyDepreciateRate);
+			fullAmountPeriod = fullAmountPeriod.add(amountUseNewRate);
+		}
 		
-		// save on ThreadLocal for re-get at ModelDepreciationExpHandle to save to MDepreciationExp
-		if (dailyDepreciateRateForNewAssetValue != null)
-			activePeriodDailyDepreciateRate.set(dailyDepreciateRateForNewAssetValue);
-		else
-			activePeriodDailyDepreciateRate.set(dailyDepreciateRateForOldAssetValue);
+		// save current rate
+		if (daysUseNewRate.compareTo(BigDecimal.ZERO) > 0) {
+			// save on ThreadLocal for re-get at ModelDepreciationExpHandle to save to MDepreciationExp
+			saveDailyDepreciateRate.set(newDailyDepreciateRate);	
+		}else {
+			saveDailyDepreciateRate.set(dailyDepreciateRate);
+		}
 		
-		BigDecimal result = prevDailyRateAmount.add(currentDailyRateAmount);
-		accumulatedDep = accumulatedDep.add(result);
+		// accumulated
+		accumulatedDep = accumulatedDep.add(fullAmountPeriod);
 
-		return result;
+		return fullAmountPeriod;
 	}
 
 	/**
@@ -203,10 +197,9 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 	 * @return
 	 */
 	protected void init(DepreciationDTO depreciationDTO) {
-		// init accumulated from wkf
+		// get accumulated from MDepreciationWorkfile as init value
 		accumulatedDep = assetwk.getA_Accumulated_Depr(assetwk.isFiscal());
-		fisrtDayAcctDateWkf = assetwk.getDateAcct().toLocalDateTime().toLocalDate().withDayOfMonth(1);
-		fisrtDayNextMonthAcctDateWkf = fisrtDayAcctDateWkf.plusMonths(1).withDayOfMonth(1);
+
 		dayStartOfLife = depreciationDTO.inServiceDate.toLocalDateTime().toLocalDate();
 
 		// (1) start date not yet depreciated
@@ -214,71 +207,66 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 		lastDepreciationExp = getLastDepreciatedExp(assetwk.getA_Asset_ID(), assetwk.getPostingType(), assetwk.getC_AcctSchema_ID());
 
 		if (lastDepreciationExp == null) {
+			// in case not depreciate then use account date of MDepreciationWorkfile
 			startMonthNotDepreciated = assetwk.getDateAcct().toLocalDateTime().toLocalDate();
 		}else {
+			// next month of last depreciation (it can get from MDepreciationWorkfile like above)
 			startMonthNotDepreciated = lastDepreciationExp.getDateAcct().toLocalDateTime().toLocalDate().plusMonths(1);
 		}
 
 		//(2) query change info from latest depreciated time
-		Timestamp startTimeNotDepreciated = Timestamp.valueOf(startMonthNotDepreciated.withDayOfMonth(1).atStartOfDay());
+		Timestamp startTimeNotDepreciated = Timestamp.valueOf(startMonthNotDepreciated.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay());
 
-		effectChanges = MZZAssetChange.getAssetChangesForRevaluation(assetwk.getA_Asset_ID(), assetwk.getPostingType(),
+		// list order by newest to older
+		activeAssetChanges = MZZAssetChange.getAssetChangesForRevaluation(assetwk.getA_Asset_ID(), assetwk.getPostingType(),
 				assetwk.getC_AcctSchema_ID(), startTimeNotDepreciated, depreciationDTO.trxName);
 
-		if (!effectChanges.isEmpty()) {
-			lastDateEffectChange = effectChanges.get(0).getDateAcct().toLocalDateTime().toLocalDate();
+		if (!activeAssetChanges.isEmpty()) {
+			changeDate = activeAssetChanges.get(0).getDateAcct().toLocalDateTime().toLocalDate();
 		}
 
 		// (3) average number of days in month
 		averageDaysInMonth = daysInYear.divide(monthsInYear, depreciationDTO.scale, RoundingMode.HALF_DOWN);
 
 		// (4) end date of use life
-		LocalDate estEndDate = dayStartOfLife.plusMonths(depreciationDTO.useFullLife.longValueExact());
+		long monthsLife = depreciationDTO.useFullLife.longValueExact();
 		if (dayStartOfLife.getDayOfMonth() == 1) {
-			dayEndOfLife = estEndDate.withDayOfMonth(estEndDate.lengthOfMonth());
+			dayEndOfLife = dayStartOfLife.plusMonths(monthsLife - 1).with(TemporalAdjusters.lastDayOfMonth());
 		} else {
-			dayEndOfLife = dayStartOfLife.plusMonths(depreciationDTO.useFullLife.longValueExact() + 1);
+			dayEndOfLife = dayStartOfLife.plusMonths(monthsLife).minusDays(1);//start day is 12/4/2025 with use life 2 then end day is 11/6/2025 
 		}
 
-		//(5) previous daily rate
+		//(5) previous/current daily rate
 		if (lastDepreciationExp != null) {
-			dailyDepreciateRateForOldAssetValue = (BigDecimal)lastDepreciationExp.get_Value(COLUMN_NAME_ZZ_DAILY_RATE);
-			if (dailyDepreciateRateForOldAssetValue == null) {
+			dailyDepreciateRate = (BigDecimal)lastDepreciationExp.get_Value(COLUMN_NAME_ZZ_DAILY_RATE);
+			if (dailyDepreciateRate == null) {// depreciate is calculator not use this plugin
 				throw new AdempiereException(Msg.getMsg(Env.getCtx(), "ZZ_AssetRevaluationDailyRateNotFound"));
 			}
 		}
 
-		// not yet do any posting for depreciation so no previous daily rate.
+		// is not depreciated so no saved rate
 		// need to get original asset cost and  original use life from first MAssetChange to calculate previous daily rate
-		if(lastDateEffectChange != null && dailyDepreciateRateForOldAssetValue == null) {
-    		MAssetChange firstChange = effectChanges.get(effectChanges.size() - 1);
+		if(changeDate != null && dailyDepreciateRate == null) {
+    		MAssetChange firstChange = activeAssetChanges.get(activeAssetChanges.size() - 1);
     		BigDecimal originalAssetCost = assetwk.getActualCost(firstChange.getAssetValueAmt());
 
     		BigDecimal totalDays = BigDecimal.valueOf(firstChange.getUseLifeMonths()).multiply(daysInYear).divide(monthsInYear, depreciationDTO.scale, RoundingMode.HALF_DOWN);
-			dailyDepreciateRateForOldAssetValue = originalAssetCost.divide(totalDays, depreciationDTO.scale, RoundingMode.HALF_DOWN);
+			dailyDepreciateRate = originalAssetCost.divide(totalDays, depreciationDTO.scale, RoundingMode.HALF_DOWN);
 
         }
 		
-		if(lastDateEffectChange == null && dailyDepreciateRateForOldAssetValue == null){
+		if(changeDate == null && dailyDepreciateRate == null){
 			// not yes depreciated and nothing change, just use value from assetwk to calculate and use for whole periods
 			BigDecimal originalAssetCost = assetwk.getActualCost();
 
     		BigDecimal totalDays = BigDecimal.valueOf(assetwk.getUseLifeMonths()).multiply(daysInYear).divide(monthsInYear, depreciationDTO.scale, RoundingMode.HALF_DOWN);
     		
-    		dailyDepreciateRateForOldAssetValue = originalAssetCost.divide(totalDays, depreciationDTO.scale, RoundingMode.HALF_DOWN);
+    		dailyDepreciateRate = originalAssetCost.divide(totalDays, depreciationDTO.scale, RoundingMode.HALF_DOWN);
 		}
 
-		if (dailyDepreciateRateForOldAssetValue == null) {
+		if (dailyDepreciateRate == null) {
 			throw new AdempiereException("something wrong this point dailyDepreciateRateForOldAssetValue need to non-null");
-		}
-		// (6) current daily rate
-		if(lastDateEffectChange == null) {
-			// has no asset change so keep use previous daily rate
-			dailyDepreciateRateForNewAssetValue = dailyDepreciateRateForOldAssetValue;
-		}else {
-			// util time when prev days before change time is complete calculator and accumulated to accumulatedDep we has enough info to calculator dailyDepreciateRateForNewAssetValue 
-		}
-		
+		}		
 	}
 
 	/**

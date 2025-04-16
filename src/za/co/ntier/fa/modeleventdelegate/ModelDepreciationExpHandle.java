@@ -21,8 +21,8 @@ public class ModelDepreciationExpHandle extends ModelEventDelegate<MDepreciation
 	
 	@BeforeNew
 	public void beforeNewMDepreciationExp(){
-		if (MqaDepreciationMethod.activePeriodDailyDepreciateRate.get() == null)
+		if (MqaDepreciationMethod.saveDailyDepreciateRate.get() == null)
 			throw new AdempiereException(Msg.getMsg(Env.getCtx(), "ZZ_AssetRevaluationDailyRateNotFound"));
-		getModel().set_ValueOfColumn(MqaDepreciationMethod.COLUMN_NAME_ZZ_DAILY_RATE, MqaDepreciationMethod.activePeriodDailyDepreciateRate.get());
+		getModel().set_ValueOfColumn(MqaDepreciationMethod.COLUMN_NAME_ZZ_DAILY_RATE, MqaDepreciationMethod.saveDailyDepreciateRate.get());
 	}
 }
