@@ -116,7 +116,7 @@ public interface IDocApprove {
 		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZ_FinalWorkflowStateValue();
 	}
 	
-	public default I_R_MailText getZZMailLineApproved() {
+	public default MMailText getZZMailLineApproved() {
 		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailLineApproved());
 	}
 	

@@ -79,7 +79,15 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	
 	protected void doLineManageApprove() {
 		if("Y".equals(pApproveRejLM)){
-			doSubmitDocForSnrAdminFinanceManage(false);
+			if (docApprove.isZZ_AllowSnrAdminFinanceApproved()) {
+				doSubmitDocForSnrAdminFinanceManage(false);
+			}else {
+				docApprove.setZZ_Date_Approved(now);
+				docApprove.setZZ_Date_LM_Approved(now);
+				docApprove.setZZ_Date_Completed(now);
+				AbstractDocApproveProcess.sendNotification(
+						docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved(), get_TrxName());
+			}
 		}else{
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByLM);
 			docApprove.setZZ_Date_Not_Approved_by_LM(now);
