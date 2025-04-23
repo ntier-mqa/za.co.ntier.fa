@@ -32,7 +32,7 @@ public interface I_ZZAssetLocation
     /** TableName=ZZAssetLocation */
     public static final String Table_Name = "ZZAssetLocation";
 
-    /** AD_Table_ID=1000017 */
+    /** AD_Table_ID=1000024 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);

@@ -31,7 +31,7 @@ public class X_ZZAssetLocation extends PO implements I_ZZAssetLocation, I_Persis
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250415L;
+	private static final long serialVersionUID = 20250422L;
 
     /** Standard Constructor */
     public X_ZZAssetLocation (Properties ctx, int ZZAssetLocation_ID, String trxName)

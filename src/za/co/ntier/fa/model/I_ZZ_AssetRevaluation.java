@@ -32,7 +32,7 @@ public interface I_ZZ_AssetRevaluation
     /** TableName=ZZ_AssetRevaluation */
     public static final String Table_Name = "ZZ_AssetRevaluation";
 
-    /** AD_Table_ID=1000013 */
+    /** AD_Table_ID=1000022 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -88,6 +88,15 @@ public interface I_ZZ_AssetRevaluation
 
 	public org.compiere.model.I_A_Asset getA_Asset() throws RuntimeException;
 
+    /** Column name A_Effective_Date */
+    public static final String COLUMNNAME_A_Effective_Date = "A_Effective_Date";
+
+	/** Set Effective Date	  */
+	public void setA_Effective_Date (Timestamp A_Effective_Date);
+
+	/** Get Effective Date	  */
+	public Timestamp getA_Effective_Date();
+
     /** Column name C_AcctSchema_ID */
     public static final String COLUMNNAME_C_AcctSchema_ID = "C_AcctSchema_ID";
 
@@ -118,19 +127,6 @@ public interface I_ZZ_AssetRevaluation
 	  * User who created this records
 	  */
 	public int getCreatedBy();
-
-    /** Column name DateAcct */
-    public static final String COLUMNNAME_DateAcct = "DateAcct";
-
-	/** Set Account Date.
-	  * Accounting Date
-	  */
-	public void setDateAcct (Timestamp DateAcct);
-
-	/** Get Account Date.
-	  * Accounting Date
-	  */
-	public Timestamp getDateAcct();
 
     /** Column name Description */
     public static final String COLUMNNAME_Description = "Description";
@@ -237,32 +233,6 @@ public interface I_ZZ_AssetRevaluation
 	  */
 	public String getValue();
 
-    /** Column name ZZ_AllowLineManageApproved */
-    public static final String COLUMNNAME_ZZ_AllowLineManageApproved = "ZZ_AllowLineManageApproved";
-
-	/** Set Allow Line Manage Approved.
-	  * Choose to allow line manage join to approved workfllow
-	  */
-	public void setZZ_AllowLineManageApproved (boolean ZZ_AllowLineManageApproved);
-
-	/** Get Allow Line Manage Approved.
-	  * Choose to allow line manage join to approved workfllow
-	  */
-	public boolean isZZ_AllowLineManageApproved();
-
-    /** Column name ZZ_AllowSnrAdminFinanceApproved */
-    public static final String COLUMNNAME_ZZ_AllowSnrAdminFinanceApproved = "ZZ_AllowSnrAdminFinanceApproved";
-
-	/** Set Allow Snr Admin Finance Approved.
-	  * Choose to allow Snr Admin Finance join to approved workfllow
-	  */
-	public void setZZ_AllowSnrAdminFinanceApproved (boolean ZZ_AllowSnrAdminFinanceApproved);
-
-	/** Get Allow Snr Admin Finance Approved.
-	  * Choose to allow Snr Admin Finance join to approved workfllow
-	  */
-	public boolean isZZ_AllowSnrAdminFinanceApproved();
-
     /** Column name ZZ_AssetRevaluation_ID */
     public static final String COLUMNNAME_ZZ_AssetRevaluation_ID = "ZZ_AssetRevaluation_ID";
 
@@ -352,19 +322,6 @@ public interface I_ZZ_AssetRevaluation
 
 	/** Get Document Status	  */
 	public String getZZ_DocStatus();
-
-    /** Column name ZZ_FinalWorkflowStateValue */
-    public static final String COLUMNNAME_ZZ_FinalWorkflowStateValue = "ZZ_FinalWorkflowStateValue";
-
-	/** Set Final Workflow State Value.
-	  * Value set to ZZ_DocStatus when reach to end of approve workflow
-	  */
-	public void setZZ_FinalWorkflowStateValue (String ZZ_FinalWorkflowStateValue);
-
-	/** Get Final Workflow State Value.
-	  * Value set to ZZ_DocStatus when reach to end of approve workflow
-	  */
-	public String getZZ_FinalWorkflowStateValue();
 
     /** Column name ZZ_Snr_Admin_Fin_ID */
     public static final String COLUMNNAME_ZZ_Snr_Admin_Fin_ID = "ZZ_Snr_Admin_Fin_ID";

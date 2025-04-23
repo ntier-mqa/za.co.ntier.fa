@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Ntier Fix Asset
 Bundle-SymbolicName: za.co.ntier.fa
 Bundle-Version: 1.0.0.qualifier
-Export-Package: za.co.ntier.fa.model
+Export-Package: za.co.ntier.fa.process.api
 Bundle-Vendor: Ntier
 Automatic-Module-Name: za.co.ntier.fa
 Bundle-ActivationPolicy: lazy
@@ -15,13 +15,13 @@ Import-Package: org.adempiere.base,
  org.adempiere.exceptions,
  org.adempiere.model,
  org.adempiere.util,
+ org.adempiere.webui.apps,
  org.compiere.model,
  org.compiere.process,
  org.compiere.util,
  org.compiere.wf,
  org.idempiere.fa.service.api,
- org.osgi.service.event;version="[1.4.0,2.0.0)",
- za.ntier.utils
+ org.osgi.service.event;version="[1.4.0,2.0.0)"
 Service-Component: OSGI-INF/za.co.ntier.fa.osgi.component.MQAFAAnnotationModelFactory.xml,
  OSGI-INF/za.co.ntier.fa.osgi.component.MQAFADepreciationMethodFactory.xml,
  OSGI-INF/za.co.ntier.fa.osgi.component.MQAFAnnotationProcessFactory.xml,

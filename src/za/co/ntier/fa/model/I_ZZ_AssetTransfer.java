@@ -32,7 +32,7 @@ public interface I_ZZ_AssetTransfer
     /** TableName=ZZ_AssetTransfer */
     public static final String Table_Name = "ZZ_AssetTransfer";
 
-    /** AD_Table_ID=1000012 */
+    /** AD_Table_ID=1000015 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -261,32 +261,6 @@ public interface I_ZZ_AssetTransfer
 
 	public org.compiere.model.I_AD_User getZZ_AD_UserTo() throws RuntimeException;
 
-    /** Column name ZZ_AllowLineManageApproved */
-    public static final String COLUMNNAME_ZZ_AllowLineManageApproved = "ZZ_AllowLineManageApproved";
-
-	/** Set Allow Line Manage Approved.
-	  * Choose to allow line manage join to approved workfllow
-	  */
-	public void setZZ_AllowLineManageApproved (boolean ZZ_AllowLineManageApproved);
-
-	/** Get Allow Line Manage Approved.
-	  * Choose to allow line manage join to approved workfllow
-	  */
-	public boolean isZZ_AllowLineManageApproved();
-
-    /** Column name ZZ_AllowSnrAdminFinanceApproved */
-    public static final String COLUMNNAME_ZZ_AllowSnrAdminFinanceApproved = "ZZ_AllowSnrAdminFinanceApproved";
-
-	/** Set Allow Snr Admin Finance Approved.
-	  * Choose to allow Snr Admin Finance join to approved workfllow
-	  */
-	public void setZZ_AllowSnrAdminFinanceApproved (boolean ZZ_AllowSnrAdminFinanceApproved);
-
-	/** Get Allow Snr Admin Finance Approved.
-	  * Choose to allow Snr Admin Finance join to approved workfllow
-	  */
-	public boolean isZZ_AllowSnrAdminFinanceApproved();
-
     /** Column name ZZ_AssetTransfer_ID */
     public static final String COLUMNNAME_ZZ_AssetTransfer_ID = "ZZ_AssetTransfer_ID";
 
@@ -376,19 +350,6 @@ public interface I_ZZ_AssetTransfer
 
 	/** Get Document Status	  */
 	public String getZZ_DocStatus();
-
-    /** Column name ZZ_FinalWorkflowStateValue */
-    public static final String COLUMNNAME_ZZ_FinalWorkflowStateValue = "ZZ_FinalWorkflowStateValue";
-
-	/** Set Final Workflow State Value.
-	  * Value set to ZZ_DocStatus when reach to end of approve workflow
-	  */
-	public void setZZ_FinalWorkflowStateValue (String ZZ_FinalWorkflowStateValue);
-
-	/** Get Final Workflow State Value.
-	  * Value set to ZZ_DocStatus when reach to end of approve workflow
-	  */
-	public String getZZ_FinalWorkflowStateValue();
 
     /** Column name ZZ_Snr_Admin_Fin_ID */
     public static final String COLUMNNAME_ZZ_Snr_Admin_Fin_ID = "ZZ_Snr_Admin_Fin_ID";

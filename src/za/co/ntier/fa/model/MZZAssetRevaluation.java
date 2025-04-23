@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import org.compiere.util.Env;
 
-import za.co.ntier.fa.process.IDocApprove;
+import za.co.ntier.fa.process.api.IDocApprove;
 
 public class MZZAssetRevaluation  extends X_ZZ_AssetRevaluation implements IDocApprove{
 

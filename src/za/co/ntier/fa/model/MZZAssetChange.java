@@ -93,10 +93,48 @@ public class MZZAssetChange extends MAssetChange {
 			rs = null;
 			pstmt = null;
 		}
+	}
+	
+	public static MAssetChange getFirstAssetChangesForRevaluation(int assetID, String postingType, int acctSchemaID, String trxName) {
+		String sqlQueryAssetChange = String.format("""
+				SELECT *
+				FROM %s
+				WHERE
+				    %s = ?
+				    AND %s IN (?, ?)
+				    AND %s = ?
+				    AND %s = ?
+				ORDER BY %s ASC LIMIT 1
+				""",
+				I_A_Asset_Change.Table_Name,
+				I_A_Asset_Change.COLUMNNAME_A_Asset_ID,
+				I_A_Asset_Change.COLUMNNAME_ChangeType,
+				I_A_Asset_Change.COLUMNNAME_C_AcctSchema_ID,
+				I_A_Asset_Change.COLUMNNAME_PostingType,
+				I_A_Asset_Change.COLUMNNAME_Created
+				);
 
-		/*return new Query(Env.getCtx(), I_A_Asset_Change.Table_Name, whereClause, trxName)
-									.setParameters()
-									.setOrderBy(I_A_Asset_Change.COLUMNNAME_DateAcct + " DESC")
-									.list();*/
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		try
+		{
+			pstmt = DB.prepareStatement(sqlQueryAssetChange, trxName);
+			DB.setParameters(pstmt, new Object [] {assetID, X_A_Asset_Change.CHANGETYPE_Revaluation, X_A_Asset_Change.CHANGETYPE_Usage, acctSchemaID, postingType});
+			rs = pstmt.executeQuery();	
+			MAssetChange assetChange = null;
+			if (rs.next()){
+				assetChange = new MAssetChange(Env.getCtx(), rs, trxName);
+			}
+
+			return assetChange;
+		}
+		catch (Exception e){
+			throw new AdempiereException(e);
+		}finally{
+			DB.close(rs, pstmt);
+			rs = null;
+			pstmt = null;
+		}
+
 	}
 }

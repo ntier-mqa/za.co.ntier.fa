@@ -1,6 +1,12 @@
-package za.co.ntier.fa.process;
+package za.co.ntier.fa.process.api;
 
 import java.sql.Timestamp;
+
+import org.compiere.model.I_R_MailText;
+import org.compiere.model.MMailText;
+import org.compiere.model.PO;
+
+import za.co.ntier.model.MZZConfigDocApproveFlow;
 
 public interface IDocApprove {
 	/** Approve/Do Not Approve = AP */
@@ -88,45 +94,59 @@ public interface IDocApprove {
 	 * @param completeDate
 	 */
 	public void setZZ_Date_Completed (Timestamp completeDate);
-	/**
-	 * detect document need to approve by line manage
-	 * @return
-	 */
-	public boolean isZZ_AllowLineManageApproved();
-	/**
-	 * detect document need to approve by Snr Admin Finance
-	 * @return
-	 */
-	public boolean isZZ_AllowSnrAdminFinanceApproved();
-	/**
-	 * doc status after final approval
-	 * @return
-	 */
-	public String getZZ_FinalWorkflowStateValue();
 	
-	public default boolean isZZ_ID_Copy_Uploaded() {
-		return true;
-	}
-	public default boolean isZZ_AOR_Uploaded() {
-		return true;
-	}
-
-	public default String getSubject() {
-		return "default subject";
-	}
-	
-	public default String getMessage() {
-		return "default message";
-	}
-	
-	public default int getMessageID() {
-		return 1000009;//TODO change to default message id
-	}
-
 	/**
 	 * get user who created/summit this document
 	 * 
 	 * @return
 	 */
 	public int getCreatedBy();
+	
+	public int get_Table_ID();
+	
+	public default boolean isZZ_AllowLineManageApproved() {
+		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).isZZ_AllowLineManageApproved();
+	}
+
+	public default  boolean isZZ_AllowSnrAdminFinanceApproved() {
+		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).isZZ_AllowSnrAdminFinanceApproved();
+	}
+
+	public default String getZZ_FinalWorkflowStateValue() {
+		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZ_FinalWorkflowStateValue();
+	}
+	
+	public default I_R_MailText getZZMailLineApproved() {
+		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailLineApproved());
+	}
+	
+	public default MMailText getZZMailLineReject() {
+		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailLineReject());
+	}
+
+	public default MMailText getZZMailRequestLine() {
+		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailRequestLine());
+	}
+	
+	public default MMailText getZZMailRequestSnr() {
+		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailRequestSnr());
+	}
+	
+	public default MMailText getZZMailSnrApproved() {
+		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailSnrApproved());
+	}
+	
+	public default MMailText getZZMailSnrRejectLine() {
+		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailSnrRejectLine());
+	}
+	
+	public default MMailText getZZMailSnrRejectSubmitor() {
+		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailSnrRejectSubmitor());
+	}
+	
+	public default MMailText setPOForMail(I_R_MailText mailTemplate) {
+		MMailText mail = (MMailText)mailTemplate;
+		mail.setPO((PO)this);
+		return mail;
+	}
 }

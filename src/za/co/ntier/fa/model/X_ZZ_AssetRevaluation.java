@@ -34,7 +34,7 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250415L;
+	private static final long serialVersionUID = 20250422L;
 
     /** Standard Constructor */
     public X_ZZ_AssetRevaluation (Properties ctx, int ZZ_AssetRevaluation_ID, String trxName)
@@ -42,12 +42,6 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
       super (ctx, ZZ_AssetRevaluation_ID, trxName);
       /** if (ZZ_AssetRevaluation_ID == 0)
         {
-			setDateAcct (new Timestamp( System.currentTimeMillis() ));
-// @#Date@
-			setZZ_AllowLineManageApproved (false);
-// N
-			setZZ_AllowSnrAdminFinanceApproved (true);
-// Y
 			setZZ_AssetRevaluation_ID (0);
         } */
     }
@@ -58,12 +52,6 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
       super (ctx, ZZ_AssetRevaluation_ID, trxName, virtualColumns);
       /** if (ZZ_AssetRevaluation_ID == 0)
         {
-			setDateAcct (new Timestamp( System.currentTimeMillis() ));
-// @#Date@
-			setZZ_AllowLineManageApproved (false);
-// N
-			setZZ_AllowSnrAdminFinanceApproved (true);
-// Y
 			setZZ_AssetRevaluation_ID (0);
         } */
     }
@@ -74,12 +62,6 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
       super (ctx, ZZ_AssetRevaluation_UU, trxName);
       /** if (ZZ_AssetRevaluation_UU == null)
         {
-			setDateAcct (new Timestamp( System.currentTimeMillis() ));
-// @#Date@
-			setZZ_AllowLineManageApproved (false);
-// N
-			setZZ_AllowSnrAdminFinanceApproved (true);
-// Y
 			setZZ_AssetRevaluation_ID (0);
         } */
     }
@@ -90,12 +72,6 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
       super (ctx, ZZ_AssetRevaluation_UU, trxName, virtualColumns);
       /** if (ZZ_AssetRevaluation_UU == null)
         {
-			setDateAcct (new Timestamp( System.currentTimeMillis() ));
-// @#Date@
-			setZZ_AllowLineManageApproved (false);
-// N
-			setZZ_AllowSnrAdminFinanceApproved (true);
-// Y
 			setZZ_AssetRevaluation_ID (0);
         } */
     }
@@ -174,6 +150,21 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 		return ii.intValue();
 	}
 
+	/** Set Effective Date.
+		@param A_Effective_Date Effective Date
+	*/
+	public void setA_Effective_Date (Timestamp A_Effective_Date)
+	{
+		set_Value (COLUMNNAME_A_Effective_Date, A_Effective_Date);
+	}
+
+	/** Get Effective Date.
+		@return Effective Date	  */
+	public Timestamp getA_Effective_Date()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_A_Effective_Date);
+	}
+
 	public org.compiere.model.I_C_AcctSchema getC_AcctSchema() throws RuntimeException
 	{
 		return (org.compiere.model.I_C_AcctSchema)MTable.get(getCtx(), org.compiere.model.I_C_AcctSchema.Table_ID)
@@ -200,22 +191,6 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
-	}
-
-	/** Set Account Date.
-		@param DateAcct Accounting Date
-	*/
-	public void setDateAcct (Timestamp DateAcct)
-	{
-		set_Value (COLUMNNAME_DateAcct, DateAcct);
-	}
-
-	/** Get Account Date.
-		@return Accounting Date
-	  */
-	public Timestamp getDateAcct()
-	{
-		return (Timestamp)get_Value(COLUMNNAME_DateAcct);
 	}
 
 	/** Set Description.
@@ -329,52 +304,6 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 	public String getValue()
 	{
 		return (String)get_Value(COLUMNNAME_Value);
-	}
-
-	/** Set Allow Line Manage Approved.
-		@param ZZ_AllowLineManageApproved Choose to allow line manage join to approved workfllow
-	*/
-	public void setZZ_AllowLineManageApproved (boolean ZZ_AllowLineManageApproved)
-	{
-		set_ValueNoCheck (COLUMNNAME_ZZ_AllowLineManageApproved, Boolean.valueOf(ZZ_AllowLineManageApproved));
-	}
-
-	/** Get Allow Line Manage Approved.
-		@return Choose to allow line manage join to approved workfllow
-	  */
-	public boolean isZZ_AllowLineManageApproved()
-	{
-		Object oo = get_Value(COLUMNNAME_ZZ_AllowLineManageApproved);
-		if (oo != null)
-		{
-			 if (oo instanceof Boolean)
-				 return ((Boolean)oo).booleanValue();
-			return "Y".equals(oo);
-		}
-		return false;
-	}
-
-	/** Set Allow Snr Admin Finance Approved.
-		@param ZZ_AllowSnrAdminFinanceApproved Choose to allow Snr Admin Finance join to approved workfllow
-	*/
-	public void setZZ_AllowSnrAdminFinanceApproved (boolean ZZ_AllowSnrAdminFinanceApproved)
-	{
-		set_ValueNoCheck (COLUMNNAME_ZZ_AllowSnrAdminFinanceApproved, Boolean.valueOf(ZZ_AllowSnrAdminFinanceApproved));
-	}
-
-	/** Get Allow Snr Admin Finance Approved.
-		@return Choose to allow Snr Admin Finance join to approved workfllow
-	  */
-	public boolean isZZ_AllowSnrAdminFinanceApproved()
-	{
-		Object oo = get_Value(COLUMNNAME_ZZ_AllowSnrAdminFinanceApproved);
-		if (oo != null)
-		{
-			 if (oo instanceof Boolean)
-				 return ((Boolean)oo).booleanValue();
-			return "Y".equals(oo);
-		}
-		return false;
 	}
 
 	/** Set Asset Revaluation.
@@ -555,37 +484,6 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 	public String getZZ_DocStatus()
 	{
 		return (String)get_Value(COLUMNNAME_ZZ_DocStatus);
-	}
-
-	/** Approved = AP */
-	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Approved = "AP";
-	/** Completed = CO */
-	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Completed = "CO";
-	/** Draft = DR */
-	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Draft = "DR";
-	/** In Progress = IP */
-	public static final String ZZ_FINALWORKFLOWSTATEVALUE_InProgress = "IP";
-	/** Not Approved by LM = NL */
-	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByLM = "NL";
-	/** Not Approved by Snr Admin Finance = NS */
-	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedBySnrAdminFinance = "NS";
-	/** Submitted = SU */
-	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Submitted = "SU";
-	/** Set Final Workflow State Value.
-		@param ZZ_FinalWorkflowStateValue Value set to ZZ_DocStatus when reach to end of approve workflow
-	*/
-	public void setZZ_FinalWorkflowStateValue (String ZZ_FinalWorkflowStateValue)
-	{
-
-		set_Value (COLUMNNAME_ZZ_FinalWorkflowStateValue, ZZ_FinalWorkflowStateValue);
-	}
-
-	/** Get Final Workflow State Value.
-		@return Value set to ZZ_DocStatus when reach to end of approve workflow
-	  */
-	public String getZZ_FinalWorkflowStateValue()
-	{
-		return (String)get_Value(COLUMNNAME_ZZ_FinalWorkflowStateValue);
 	}
 
 	public org.compiere.model.I_AD_User getZZ_Snr_Admin_Fin() throws RuntimeException

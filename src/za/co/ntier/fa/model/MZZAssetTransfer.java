@@ -5,7 +5,9 @@ import java.util.Properties;
 
 import org.compiere.util.Env;
 
-import za.co.ntier.fa.process.IDocApprove;
+import za.co.ntier.fa.process.api.IDocApprove;
+import za.co.ntier.model.MZZConfigDocApproveFlow;
+import za.co.ntier.model.X_ZZConfigDocApproveFlow;
 
 public class MZZAssetTransfer extends X_ZZ_AssetTransfer implements IDocApprove {
 
@@ -21,5 +23,22 @@ public class MZZAssetTransfer extends X_ZZ_AssetTransfer implements IDocApprove 
 
 	public MZZAssetTransfer(Properties ctx, ResultSet rs, String trxName) {
 		super(ctx, rs, trxName);
+	}
+	
+
+	X_ZZConfigDocApproveFlow configDocApproveFlow = MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID());
+	@Override
+	public boolean isZZ_AllowLineManageApproved() {
+		return configDocApproveFlow.isZZ_AllowLineManageApproved();
+	}
+
+	@Override
+	public boolean isZZ_AllowSnrAdminFinanceApproved() {
+		return configDocApproveFlow.isZZ_AllowSnrAdminFinanceApproved();
+	}
+
+	@Override
+	public String getZZ_FinalWorkflowStateValue() {
+		return configDocApproveFlow.getZZ_FinalWorkflowStateValue();
 	}
 }

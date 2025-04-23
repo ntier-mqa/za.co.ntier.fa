@@ -1,6 +1,7 @@
 package za.co.ntier.fa.depreciation;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import org.compiere.model.MAssetChange;
 import org.compiere.model.MDepreciationExp;
 import org.compiere.model.MDepreciationWorkfile;
 import org.compiere.model.Query;
+import org.compiere.util.CLogger;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.idempiere.fa.service.api.DepreciationDTO;
@@ -21,7 +23,9 @@ import org.idempiere.fa.service.api.IDepreciationMethod;
 import za.co.ntier.fa.model.I_A_Depreciation_Exp;
 import za.co.ntier.fa.model.MZZAssetChange;
 
+
 public class MqaDepreciationMethod implements IDepreciationMethod {
+	protected static final CLogger log = CLogger.getCLogger(MqaDepreciationMethod.class);
 	// save to use at event handle to save to MDepreciationExp
 	public static final ThreadLocal<BigDecimal> saveDailyDepreciateRate = new ThreadLocal<>();
 	public static final ThreadLocal<BigDecimal> saveMonthlyDepreciateRate = new ThreadLocal<>();
@@ -175,7 +179,7 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 
     		BigDecimal remainDays = BigDecimal.valueOf(ChronoUnit.DAYS.between(changeDate, dayEndOfLife) + 1);
 
-    		newDailyDepreciateRate = remainAssetCost.divide(remainDays, depreciationDTO.scale, RoundingMode.HALF_DOWN);
+    		newDailyDepreciateRate = remainAssetCost.divide(remainDays, MathContext.DECIMAL128);
     		
     		BigDecimal monthsRemmain = null;
     		
@@ -183,10 +187,10 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
     			// plus 1 to end month because ChronoUnit.MONTHS.between exclude end day
     			monthsRemmain = BigDecimal.valueOf(ChronoUnit.MONTHS.between(dayStartOfLife, dayEndOfLife.plusDays(1)));
     		}else {
-    			monthsRemmain = remainDays.multiply(monthsInYear).divide(daysInYear, depreciationDTO.scale, RoundingMode.HALF_DOWN);
+    			monthsRemmain = remainDays.multiply(monthsInYear).divide(daysInYear, MathContext.DECIMAL128);
     		}
     		
-    		newMonthlyDepreciateRate = remainAssetCost.divide(monthsRemmain, depreciationDTO.scale, RoundingMode.HALF_DOWN);
+    		newMonthlyDepreciateRate = remainAssetCost.divide(monthsRemmain, MathContext.DECIMAL128);
 		}
 		
 		// amount use new rate
@@ -205,6 +209,8 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 			saveMonthlyDepreciateRate.set(monthlyDepreciateRate);
 		}
 		
+		// MDepreciation.invoke do sale like this so need to do same here to make accumulatedDep same and keep latest period correct
+		fullAmountPeriod = fullAmountPeriod.setScale(depreciationDTO.scale, RoundingMode.HALF_UP);
 		// accumulated
 		accumulatedDep = accumulatedDep.add(fullAmountPeriod);
 
@@ -246,7 +252,7 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 		}
 
 		// (3) average number of days in month
-		averageDaysInMonth = daysInYear.divide(monthsInYear, depreciationDTO.scale, RoundingMode.HALF_DOWN);
+		averageDaysInMonth = daysInYear.divide(monthsInYear, MathContext.DECIMAL128);
 
 		// (4) end date of use life
 		long monthsLife = depreciationDTO.useFullLife.longValueExact();
@@ -268,14 +274,24 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 
 		// is not depreciated so no saved rate
 		// need to get original asset cost and  original use life from first MAssetChange to calculate previous daily rate
-		if(changeDate != null && dailyDepreciateRate == null) {
-    		MAssetChange firstChange = activeAssetChanges.get(activeAssetChanges.size() - 1);
-    		BigDecimal originalAssetCost = assetwk.getActualCost(firstChange.getAssetValueAmt());
-    		
-    		long useLifeDays = ChronoUnit.DAYS.between(dayStartOfLife, dayEndOfLife) + 1;
-			dailyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(useLifeDays), depreciationDTO.scale, RoundingMode.HALF_DOWN);
-			int useLifeMonths = firstChange.getUseLifeMonths();
-			monthlyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(useLifeMonths), depreciationDTO.scale, RoundingMode.HALF_DOWN);
+		if(dailyDepreciateRate == null) {
+    		MAssetChange firstChange = MZZAssetChange.getFirstAssetChangesForRevaluation(assetwk.getA_Asset_ID(), assetwk.getPostingType(),
+    				assetwk.getC_AcctSchema_ID(), depreciationDTO.trxName);
+    		if (firstChange != null) {
+    			BigDecimal originalAssetCost = assetwk.getActualCost(firstChange.getAssetValueAmt());
+    			
+    			int originalUseLifeMonths = firstChange.getUseLifeMonths();
+    			LocalDate originalDayEndOfLife = null;
+    			if (dayStartOfLife.getDayOfMonth() == 1) {
+    				originalDayEndOfLife = dayStartOfLife.plusMonths(originalUseLifeMonths - 1).with(TemporalAdjusters.lastDayOfMonth());
+    			} else {
+    				originalDayEndOfLife = dayStartOfLife.plusMonths(originalUseLifeMonths).minusDays(1);//start day is 12/4/2025 with use life 2 then end day is 11/6/2025 
+    			}
+    			
+        		long originalUseLifeDays = ChronoUnit.DAYS.between(dayStartOfLife, originalDayEndOfLife) + 1;
+    			dailyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(originalUseLifeDays), MathContext.DECIMAL128);
+    			monthlyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(originalUseLifeMonths), MathContext.DECIMAL128);
+    		}
         }
 		
 		if(changeDate == null && dailyDepreciateRate == null){
@@ -283,9 +299,9 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 			BigDecimal originalAssetCost = assetwk.getActualCost();
 
 			long useLifeDays = ChronoUnit.DAYS.between(dayStartOfLife, dayEndOfLife) + 1;
-			dailyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(useLifeDays), depreciationDTO.scale, RoundingMode.HALF_DOWN);
+			dailyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(useLifeDays), MathContext.DECIMAL128);
 			int useLifeMonths = assetwk.getUseLifeMonths();
-			monthlyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(useLifeMonths), depreciationDTO.scale, RoundingMode.HALF_DOWN);
+			monthlyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(useLifeMonths), MathContext.DECIMAL128);
 
 		}
 

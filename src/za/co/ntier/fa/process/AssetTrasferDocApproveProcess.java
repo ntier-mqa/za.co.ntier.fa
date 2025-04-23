@@ -5,9 +5,10 @@ import org.compiere.model.MAsset;
 
 import za.co.ntier.fa.model.I_A_Asset;
 import za.co.ntier.fa.model.MZZAssetTransfer;
+import za.co.ntier.fa.process.api.AbstractDocApproveProcess;
 
 @org.adempiere.base.annotation.Process(name="za.co.ntier.fa.process.AssetTrasferDocApproveProcess")
-public class AssetTrasferDocApproveProcess extends BaseDocApproveProcess<MZZAssetTransfer> {
+public class AssetTrasferDocApproveProcess extends AbstractDocApproveProcess<MZZAssetTransfer> {
 
 	@Override
 	protected void initDocApproveObj() {

@@ -5,7 +5,7 @@ import java.util.Properties;
 
 import org.compiere.util.Env;
 
-import za.co.ntier.fa.process.IDocApprove;
+import za.co.ntier.fa.process.api.IDocApprove;
 
 public class MZZAssetDisposal extends X_ZZ_Asset_Disposal implements IDocApprove{
 

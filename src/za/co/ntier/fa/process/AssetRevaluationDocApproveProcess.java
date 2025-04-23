@@ -1,5 +1,7 @@
 package za.co.ntier.fa.process;
 
+import java.math.BigDecimal;
+
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAsset;
 import org.compiere.model.MAssetChange;
@@ -10,9 +12,10 @@ import org.compiere.util.Msg;
 import za.co.ntier.fa.model.I_ZZ_AssetRevaluation;
 import za.co.ntier.fa.model.MZZAssetChange;
 import za.co.ntier.fa.model.MZZAssetRevaluation;
+import za.co.ntier.fa.process.api.AbstractDocApproveProcess;
 
 @org.adempiere.base.annotation.Process(name="za.co.ntier.fa.process.AssetTrasferDocApproveProcess")
-public class AssetRevaluationDocApproveProcess extends BaseDocApproveProcess<MZZAssetRevaluation> {
+public class AssetRevaluationDocApproveProcess extends AbstractDocApproveProcess<MZZAssetRevaluation> {
 	@Override
 	protected void initDocApproveObj() {
 		docApprove = poObj;
@@ -61,7 +64,7 @@ public class AssetRevaluationDocApproveProcess extends BaseDocApproveProcess<MZZ
 		boolean isCostChange = poObj.get_Value(I_ZZ_AssetRevaluation.COLUMNNAME_A_Asset_Cost) != null;
 		MAssetChange change = MZZAssetChange.createAssetChangeForRevaluation(getCtx(), get_TrxName(), isCostChange,
 				poObj.getA_Asset_ID(), dwf.getPostingType(), poObj.getC_AcctSchema_ID(),
-				dwf.getA_Accumulated_Depr(false), poObj.getDateAcct());
+				dwf.getA_Accumulated_Depr(false), poObj.getA_Effective_Date());
 
 		saveAssetBeforeChange(change, dwf);
 		if (isCostChange) {//ZZ_AssetRevaluationNothingChange validate make sure one thing need to change, when both change then priority is cost
@@ -71,9 +74,9 @@ public class AssetRevaluationDocApproveProcess extends BaseDocApproveProcess<MZZ
 			dwf.setUseLifeMonths(poObj.getUseLifeMonths());
 			dwf.setA_Life_Period(poObj.getUseLifeMonths());
 			
-			dwf.setUseLifeYears_F(poObj.getUseLifeYears());
-			dwf.setUseLifeMonths_F(poObj.getUseLifeMonths());
-			dwf.setA_Life_Period_F(poObj.getUseLifeMonths());
+			dwf.setUseLifeYears_F(BigDecimal.ZERO);
+			dwf.setUseLifeMonths_F(0);
+			dwf.setA_Life_Period_F(0);
 		}
 
 		dwf.saveEx(get_TrxName());

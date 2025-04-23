@@ -31,7 +31,7 @@ public class X_ZZAssetRegion extends PO implements I_ZZAssetRegion, I_Persistent
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250415L;
+	private static final long serialVersionUID = 20250422L;
 
     /** Standard Constructor */
     public X_ZZAssetRegion (Properties ctx, int ZZAssetRegion_ID, String trxName)
