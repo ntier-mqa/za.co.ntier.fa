@@ -21,7 +21,8 @@ Import-Package: org.adempiere.base,
  org.compiere.util,
  org.compiere.wf,
  org.idempiere.fa.service.api,
- org.osgi.service.event;version="[1.4.0,2.0.0)"
+ org.osgi.service.event;version="[1.4.0,2.0.0)",
+ za.co.ntier.fa.process.api
 Service-Component: OSGI-INF/za.co.ntier.fa.osgi.component.MQAFAAnnotationModelFactory.xml,
  OSGI-INF/za.co.ntier.fa.osgi.component.MQAFADepreciationMethodFactory.xml,
  OSGI-INF/za.co.ntier.fa.osgi.component.MQAFAnnotationProcessFactory.xml,

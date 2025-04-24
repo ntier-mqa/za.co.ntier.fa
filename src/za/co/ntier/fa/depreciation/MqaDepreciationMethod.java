@@ -121,7 +121,14 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 
 		// (1) bring all remain cost to end period
 		if (depreciationDTO.period == periodsCount) {
-			return assetwk.getRemainingCost(accumulatedDep);
+			BigDecimal lastPeriod = assetwk.getRemainingCost(accumulatedDep);
+			logCalculator.append("**** Last period: ****").append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Actual cost:").append(assetwk.getActualCost()).append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Accumulated depreciate:").append(accumulatedDep).append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Amount:").append(lastPeriod).append(System.lineSeparator());
+			
+			log.info(logCalculator.toString());
+			return lastPeriod;
 		}
 
 		//(2) start and end date of period calculation
@@ -132,7 +139,7 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 		if (depreciationDTO.period == 1) {
 			dayStartOfPeriod = dayStartOfLife;
 		} else {
-			dayStartOfPeriod = dayStartOfLife.plusMonths(depreciationDTO.period - 1).with(TemporalAdjusters.firstDayOfMonth());
+			dayStartOfPeriod = dayStartOfLife.plusMonths(depreciationDTO.period - 1l).with(TemporalAdjusters.firstDayOfMonth());
 		}
 
 		// always at day end of month because case last period already done above
@@ -142,6 +149,11 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 		BigDecimal daysUseOldRate = BigDecimal.ZERO;
 		BigDecimal daysUseNewRate = BigDecimal.ZERO;
 		boolean isFullMonths = false;
+		boolean isSplitMonth = changeDate != null && 
+				(
+						(dayStartOfPeriod.isBefore(changeDate) && dayEndOfPeriod.isAfter(changeDate)) ||
+						changeDate.isEqual(dayEndOfPeriod)
+				);
 		// hasn't change or calculator for period before change date so have date for old rate only
 		if (changeDate == null || dayEndOfPeriod.isBefore(changeDate)) {
 			if (dayStartOfPeriod.getDayOfMonth() == 1) { // full month
@@ -152,14 +164,15 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
             }
 		// calculator for period after change date so have date for new rate only
 		}else if (dayStartOfPeriod.isAfter(changeDate) || changeDate.isEqual(dayStartOfPeriod)){
-			if (dayStartOfPeriod.getDayOfMonth() == 1) { // full month, end partial month already done at (1)
+			if (dayStartOfPeriod.getDayOfMonth() == 1) {
+				// full month, end partial month already done at (1)
 				daysUseNewRate = averageDaysInMonth;
 				isFullMonths = true;
 			} else {
+				// first month
 				daysUseNewRate = BigDecimal.valueOf(ChronoUnit.DAYS.between(dayStartOfPeriod, dayEndOfPeriod) + 1);
             }
-		}else if ((dayStartOfPeriod.isBefore(changeDate) && dayEndOfPeriod.isAfter(changeDate)) ||
-				changeDate.isEqual(dayEndOfPeriod)){// new change split current period
+		}else if (isSplitMonth){// new change split current period
 			daysUseOldRate = BigDecimal.valueOf(ChronoUnit.DAYS.between(dayStartOfPeriod, changeDate));
 			daysUseNewRate = BigDecimal.valueOf(ChronoUnit.DAYS.between(changeDate, dayEndOfPeriod) + 1);
 		}else {
@@ -169,8 +182,14 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 		
 		// (3) amount use old and new rate
 		// can be zero when prevDailyRateDays is zero
-		BigDecimal amountUseOldRate = daysUseOldRate.compareTo(BigDecimal.ZERO) > 0 && isFullMonths ? monthlyDepreciateRate : daysUseOldRate.multiply(dailyDepreciateRate);
-		
+		BigDecimal amountUseOldRate = null;
+		if (daysUseOldRate.compareTo(BigDecimal.ZERO) > 0 && isFullMonths) {
+			amountUseOldRate = monthlyDepreciateRate;
+		}else if (daysUseOldRate.compareTo(BigDecimal.ZERO) > 0 && !isFullMonths) {
+			amountUseOldRate = daysUseOldRate.multiply(dailyDepreciateRate);
+		}else {
+			amountUseOldRate = BigDecimal.ZERO;
+		}
 		BigDecimal fullAmountPeriod = amountUseOldRate;
 		
 		// reach to new rate calculator it
@@ -183,6 +202,9 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
     		
     		BigDecimal monthsRemmain = null;
     		
+    		if (changeDate == null)// can't happen because daysUseNewRate > 0, it here for safety
+    			throw new AdempiereException(Msg.getMsg(Env.getCtx(), "ZZ_AssetRevaluationChangeWrongLogic"));
+    		
     		if (changeDate.getDayOfMonth() == 1 && dayStartOfLife.getDayOfMonth() == 1) {
     			// plus 1 to end month because ChronoUnit.MONTHS.between exclude end day
     			monthsRemmain = BigDecimal.valueOf(ChronoUnit.MONTHS.between(dayStartOfLife, dayEndOfLife.plusDays(1)));
@@ -191,11 +213,28 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
     		}
     		
     		newMonthlyDepreciateRate = remainAssetCost.divide(monthsRemmain, MathContext.DECIMAL128);
+    		
+    		logCalculator.append("******** New Rate: ********").append(System.lineSeparator());
+    		
+    		logCalculator.append(LINE_INDENT).append("Days for new rate:").
+    			append(changeDate).append(SEPARATE).
+    			append(dayEndOfLife).append(System.lineSeparator());
+    		
+    		logCalculator.append(LINE_INDENT).append("New daily rate (remainAssetCost/remainDays):").
+    			append(remainAssetCost).append("/").append(remainDays).append(EQUAL).append(newDailyDepreciateRate).append(System.lineSeparator());
+    		
+    		logCalculator.append(LINE_INDENT).append("New monthly rate (remainAssetCost/monthsRemmain):").
+				append(remainAssetCost).append("/").append(monthsRemmain).append(EQUAL).append(newMonthlyDepreciateRate).append(System.lineSeparator());
 		}
 		
+		logCalculator.append("**** Period:").append(depreciationDTO.period).append(" ****").append(System.lineSeparator());
+		logCalculator.append(LINE_INDENT).append("Is full amount:").append(isFullMonths).append(System.lineSeparator());
+		logCalculator.append(LINE_INDENT).append("Is split month:").append(isSplitMonth).append(System.lineSeparator());
+		
+		BigDecimal amountUseNewRate = null;
 		// amount use new rate
 		if (daysUseNewRate.compareTo(BigDecimal.ZERO) > 0) {
-			BigDecimal amountUseNewRate = isFullMonths ? newMonthlyDepreciateRate : daysUseNewRate.multiply(newDailyDepreciateRate);
+			amountUseNewRate = isFullMonths ? newMonthlyDepreciateRate : daysUseNewRate.multiply(newDailyDepreciateRate);
 			fullAmountPeriod = fullAmountPeriod.add(amountUseNewRate);
 		}
 		
@@ -210,13 +249,54 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 		}
 		
 		// MDepreciation.invoke do sale like this so need to do same here to make accumulatedDep same and keep latest period correct
+		if (isSplitMonth) {
+			logCalculator.append(LINE_INDENT).append("Old rate days:").
+				append(dayStartOfPeriod).append(SEPARATE).
+				append(changeDate).append(System.lineSeparator());
+			
+			logCalculator.append(LINE_INDENT).append("Old amount (days * rate):").
+				append(daysUseOldRate).
+				append(MULTIPLY).
+				append(dailyDepreciateRate).
+				append(EQUAL).
+				append(amountUseOldRate).append(System.lineSeparator());
+			
+			logCalculator.append(LINE_INDENT).append("New rate days:").
+				append(changeDate).append(SEPARATE).
+				append(dayEndOfPeriod).append(System.lineSeparator());
+			
+			logCalculator.append(LINE_INDENT).append("New amount (days * rate):").
+				append(daysUseNewRate).
+				append(MULTIPLY).
+				append(newDailyDepreciateRate).
+				append(EQUAL).
+				append(amountUseNewRate).append(System.lineSeparator());
+		}else if (!isFullMonths){
+			logCalculator.append(LINE_INDENT).append("Period days:").
+				append(dayStartOfPeriod).append(SEPARATE).
+				append(dayEndOfPeriod).append(System.lineSeparator());
+		}
+		
+		logCalculator.append(LINE_INDENT).append("Months amount:").append(fullAmountPeriod).append(System.lineSeparator());
+		
 		fullAmountPeriod = fullAmountPeriod.setScale(depreciationDTO.scale, RoundingMode.HALF_UP);
+		
+		logCalculator.append(LINE_INDENT).append("Months amount rounding:").append(fullAmountPeriod).append(System.lineSeparator());
+
 		// accumulated
 		accumulatedDep = accumulatedDep.add(fullAmountPeriod);
-
+		
+		logCalculator.append(LINE_INDENT).append("Accumulated:").append(accumulatedDep).append(System.lineSeparator());
+		
 		return fullAmountPeriod;
 	}
 
+	StringBuilder logCalculator = new StringBuilder();
+	public static final String LINE_INDENT = "    ";
+	public static final String EQUAL = " = ";
+	public static final String DEVIDE = " / ";
+	public static final String MULTIPLY = " * ";
+	public static final String SEPARATE = " - ";
 	/**
 	 * init at period start calculator to avoid repeat calculation
 	 * @param depreciationDTO
@@ -225,9 +305,11 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 	protected void init(DepreciationDTO depreciationDTO) {
 		// get accumulated from MDepreciationWorkfile as init value
 		accumulatedDep = assetwk.getA_Accumulated_Depr(assetwk.isFiscal());
-
+		logCalculator.append("Start accumulated:").append(accumulatedDep).append(System.lineSeparator());
+		
 		dayStartOfLife = depreciationDTO.inServiceDate.toLocalDateTime().toLocalDate();
-
+		logCalculator.append("Start day of life:").append(dayStartOfLife).append(System.lineSeparator());
+		
 		// (1) start date not yet depreciated
 		LocalDate startMonthNotDepreciated = null;
 		lastDepreciationExp = getLastDepreciatedExp(assetwk.getA_Asset_ID(), assetwk.getPostingType(), assetwk.getC_AcctSchema_ID(), depreciationDTO.trxName);
@@ -242,13 +324,14 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 
 		//(2) query change info from latest depreciated time
 		Timestamp startTimeNotDepreciated = Timestamp.valueOf(startMonthNotDepreciated.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay());
-
+		logCalculator.append("Start time not yet depreciated:").append(startTimeNotDepreciated).append(System.lineSeparator());
 		// list order by newest to older
 		activeAssetChanges = MZZAssetChange.getAssetChangesForRevaluation(assetwk.getA_Asset_ID(), assetwk.getPostingType(),
 				assetwk.getC_AcctSchema_ID(), startTimeNotDepreciated, depreciationDTO.trxName);
 
 		if (!activeAssetChanges.isEmpty()) {
 			changeDate = activeAssetChanges.get(0).getDateAcct().toLocalDateTime().toLocalDate();
+			logCalculator.append("Effect change time:").append(changeDate).append(System.lineSeparator());
 		}
 
 		// (3) average number of days in month
@@ -262,6 +345,8 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 			dayEndOfLife = dayStartOfLife.plusMonths(monthsLife).minusDays(1);//start day is 12/4/2025 with use life 2 then end day is 11/6/2025 
 		}
 
+		logCalculator.append("End of life:").append(dayEndOfLife).append(System.lineSeparator());
+		
 		//(5) previous/current daily rate
 		if (lastDepreciationExp != null) {
 			dailyDepreciateRate = (BigDecimal)lastDepreciationExp.get_Value(I_A_Depreciation_Exp.COLUMNNAME_ZZ_DailyRate);
@@ -270,6 +355,10 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 			if (dailyDepreciateRate == null || monthlyDepreciateRate == null) {// depreciate is calculator not use this plugin
 				throw new AdempiereException(Msg.getMsg(Env.getCtx(), "ZZ_AssetRevaluationDailyRateNotFound"));
 			}
+			
+			logCalculator.append("******** Rate get from history (DepreciationExp): ********").append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Daily rate:").append(dailyDepreciateRate).append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Monthly rate:").append(monthlyDepreciateRate).append(System.lineSeparator());
 		}
 
 		// is not depreciated so no saved rate
@@ -283,7 +372,7 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
     			int originalUseLifeMonths = firstChange.getUseLifeMonths();
     			LocalDate originalDayEndOfLife = null;
     			if (dayStartOfLife.getDayOfMonth() == 1) {
-    				originalDayEndOfLife = dayStartOfLife.plusMonths(originalUseLifeMonths - 1).with(TemporalAdjusters.lastDayOfMonth());
+    				originalDayEndOfLife = dayStartOfLife.plusMonths(originalUseLifeMonths - 1l).with(TemporalAdjusters.lastDayOfMonth());
     			} else {
     				originalDayEndOfLife = dayStartOfLife.plusMonths(originalUseLifeMonths).minusDays(1);//start day is 12/4/2025 with use life 2 then end day is 11/6/2025 
     			}
@@ -291,6 +380,15 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
         		long originalUseLifeDays = ChronoUnit.DAYS.between(dayStartOfLife, originalDayEndOfLife) + 1;
     			dailyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(originalUseLifeDays), MathContext.DECIMAL128);
     			monthlyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(originalUseLifeMonths), MathContext.DECIMAL128);
+    			
+    			logCalculator.append("******** Daily rate need to calculator by data from first change history (MAssetChange): ********").append(System.lineSeparator());
+    			logCalculator.append(LINE_INDENT).append("Daily rate:").append(dailyDepreciateRate).append(System.lineSeparator());
+    			logCalculator.append(LINE_INDENT).append("Monthly rate:").append(monthlyDepreciateRate).append(System.lineSeparator());
+    			logCalculator.append(LINE_INDENT).append("Amount:").append(originalAssetCost).append(System.lineSeparator());
+    			logCalculator.append(LINE_INDENT).append("End of life:").append(originalDayEndOfLife).append(System.lineSeparator());
+    			logCalculator.append(LINE_INDENT).append("Use months:").append(originalUseLifeMonths).append(System.lineSeparator());
+    			logCalculator.append(LINE_INDENT).append("Use days:").append(originalUseLifeDays).append(System.lineSeparator());
+    			
     		}
         }
 		
@@ -302,7 +400,14 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 			dailyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(useLifeDays), MathContext.DECIMAL128);
 			int useLifeMonths = assetwk.getUseLifeMonths();
 			monthlyDepreciateRate = originalAssetCost.divide(BigDecimal.valueOf(useLifeMonths), MathContext.DECIMAL128);
-
+			
+			logCalculator.append("******** No change so daily rate calculator by data from MDepreciationWorkfile: ********").append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Daily rate:").append(dailyDepreciateRate).append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Monthly rate:").append(monthlyDepreciateRate).append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Amount:").append(originalAssetCost).append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("End of life:").append(dayEndOfLife).append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Use months:").append(useLifeMonths).append(System.lineSeparator());
+			logCalculator.append(LINE_INDENT).append("Use days:").append(useLifeDays).append(System.lineSeparator());
 		}
 
 		if (dailyDepreciateRate == null) {
@@ -320,15 +425,17 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
 		if (useFullLife == 0) {
 			periodsCount = 0;
 		}else {
-			periodsCount = depreciationDTO.inServiceDate.toLocalDateTime().toLocalDate().getDayOfMonth() == 1 ?
-							useFullLife : useFullLife + 1;
+			hasExtraPeriod = depreciationDTO.inServiceDate.toLocalDateTime().toLocalDate().getDayOfMonth() > 1;
+			periodsCount =  hasExtraPeriod ? useFullLife + 1 : useFullLife;
 		}
 
 		return periodsCount;
 	}
-
+	
+	boolean hasExtraPeriod = false;
+	
 	@Override
 	public boolean isPeriodAdjustment() {
-		return false;
+		return hasExtraPeriod;
 	}
 }

@@ -67,7 +67,11 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	
 	protected void doSubmitDocForLineManage(){
 		if (docApprove.getLine_Manager_ID() <= 0)
-			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_ApproveChooseLineManager"));
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_DocApproveMissingLineManager"));
+		
+		if (docApprove.getLine_Manager_ID() != Env.getAD_User_ID(getCtx())) {
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_DocApproveWrongPermission"));
+		}
 		
 		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Submitted);
 		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
@@ -166,7 +170,7 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 			doSnrAdminFinanceApprove();
 			
 		}else {
-			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_WrongWorkflowState", 
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_DocApproveWrongWorkflowState", 
 					new Object [] {docApprove.isZZ_AllowLineManageApproved(),
 					docApprove.isZZ_AllowSnrAdminFinanceApproved(),
 					currentDocStatus,

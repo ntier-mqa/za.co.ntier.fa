@@ -37,7 +37,7 @@ public interface IDocApprove {
 	
 	public static final String DOCACTION_Approve = "AP";
 	
-	public final static int SNR_ADMIN_FIN_ROLE_ID = 1000003;
+	public static final int SNR_ADMIN_FIN_ROLE_ID = 1000003;
 	
 	public String getZZ_DocAction();
 	public void setZZ_DocAction(String docAction);

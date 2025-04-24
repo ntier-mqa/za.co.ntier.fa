@@ -57,7 +57,7 @@ public class AssetRevaluationDocApproveProcess extends AbstractDocApproveProcess
 	}
 
 	protected void saveAssetAfterChange(MAssetChange change, MDepreciationWorkfile dwf) {
-
+		// future can add new column to store value after change
 	}
 
 	private void revaluationAsset() {
