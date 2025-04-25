@@ -7,6 +7,7 @@ Export-Package: za.co.ntier.fa.process.api
 Bundle-Vendor: Ntier
 Automatic-Module-Name: za.co.ntier.fa
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: org.adempiere.base,
  org.adempiere.base.annotation,
