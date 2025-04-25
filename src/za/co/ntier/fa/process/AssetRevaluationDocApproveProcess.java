@@ -1,6 +1,8 @@
 package za.co.ntier.fa.process;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MAsset;
@@ -26,14 +28,10 @@ public class AssetRevaluationDocApproveProcess extends AbstractDocApproveProcess
 
 	@Override
 	protected void validateData() {
-		int assetId = poObj.getA_Asset_ID();
-		asset = MAsset.get(getCtx(), assetId, null);
-		if(assetId == 0) {
-			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_AssetRevaluationAssetNotFound"));
-		}
-
+		asset = (MAsset)poObj.getA_Asset();
+		
 		int acctSchemaId = poObj.getC_AcctSchema_ID();
-		dwf = MDepreciationWorkfile.get(getCtx(), assetId, X_A_Depreciation_Workfile.POSTINGTYPE_Actual, null, acctSchemaId);
+		dwf = MDepreciationWorkfile.get(getCtx(), asset.getA_Asset_ID(), X_A_Depreciation_Workfile.POSTINGTYPE_Actual, null, acctSchemaId);
 
 		if (dwf == null) {
 			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_AssetRevaluationBalancesNotFound"));
@@ -42,6 +40,27 @@ public class AssetRevaluationDocApproveProcess extends AbstractDocApproveProcess
 		if (poObj.get_Value(I_ZZ_AssetRevaluation.COLUMNNAME_A_Asset_Cost) == null &&
 				poObj.get_Value(I_ZZ_AssetRevaluation.COLUMNNAME_UseLifeYears) == null) {
 			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_AssetRevaluationNothingChange"));
+		}
+		
+		if (poObj.get_Value(I_ZZ_AssetRevaluation.COLUMNNAME_A_Asset_Cost) != null
+				&& dwf.getRemainingCost(poObj.getA_Asset_Cost()).compareTo(BigDecimal.ZERO) <= 0) {
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_AssetRevaluationNewAmountMakeNegativeRemainingCost"));
+		}
+		
+		if (poObj.get_Value(I_ZZ_AssetRevaluation.COLUMNNAME_UseLifeMonths) != null) {
+			int newUseLifeMonths = poObj.getUseLifeMonths();
+			boolean newLifeMonthsInDepreciated = (asset.getAssetServiceDate().toLocalDateTime().getDayOfMonth() == 1
+							&& newUseLifeMonths < dwf.getA_Current_Period() - 1)
+					|| (asset.getAssetServiceDate().toLocalDateTime().getDayOfMonth() > 1
+							&& newUseLifeMonths < dwf.getA_Current_Period() - 2);
+			if (newLifeMonthsInDepreciated) {
+				throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_AssetRevaluationNewUserLifeMonthsDepreciated"));
+			}			
+		}
+		
+		LocalDate firstDayOfAcctMonth = dwf.getDateAcct().toLocalDateTime().toLocalDate().with(TemporalAdjusters.firstDayOfMonth());
+		if (poObj.getA_Effective_Date().toLocalDateTime().toLocalDate().isBefore(firstDayOfAcctMonth)) {
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_AssetRevaluationEffectiveDateDepreciated"));
 		}
 	}
 
