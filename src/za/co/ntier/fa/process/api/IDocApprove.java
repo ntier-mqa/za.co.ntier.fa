@@ -73,6 +73,8 @@ public interface IDocApprove {
 	 */
 	public void setZZ_Date_Not_Approved_by_LM(Timestamp notApproveDate);
 
+	public int getZZ_Snr_Admin_Fin_ID();
+	
 	/**
 	 * when SnrAdminFinance approve document, Set his id here (in case ZZ_AllowSnrAdminFinanceApproved = Y)
 	 * @param ZZ_Snr_Admin_Fin_ID

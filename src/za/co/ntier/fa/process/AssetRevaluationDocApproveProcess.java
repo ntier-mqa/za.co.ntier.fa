@@ -43,7 +43,7 @@ public class AssetRevaluationDocApproveProcess extends AbstractDocApproveProcess
 		}
 		
 		if (poObj.get_Value(I_ZZ_AssetRevaluation.COLUMNNAME_A_Asset_Cost) != null
-				&& dwf.getRemainingCost(poObj.getA_Asset_Cost()).compareTo(BigDecimal.ZERO) <= 0) {
+				&& dwf.getActualCost(poObj.getA_Asset_Cost()).subtract(dwf.getA_Accumulated_Depr()).compareTo(BigDecimal.ZERO) <= 0) {
 			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_AssetRevaluationNewAmountMakeNegativeRemainingCost"));
 		}
 		

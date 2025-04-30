@@ -207,7 +207,7 @@ public class MqaDepreciationMethod implements IDepreciationMethod {
     		
     		if (changeDate.getDayOfMonth() == 1 && dayStartOfLife.getDayOfMonth() == 1) {
     			// plus 1 to end month because ChronoUnit.MONTHS.between exclude end day
-    			monthsRemmain = BigDecimal.valueOf(ChronoUnit.MONTHS.between(dayStartOfLife, dayEndOfLife.plusDays(1)));
+    			monthsRemmain = BigDecimal.valueOf(ChronoUnit.MONTHS.between(changeDate, dayEndOfLife.plusDays(1)));
     		}else {
     			monthsRemmain = remainDays.multiply(monthsInYear).divide(daysInYear, MathContext.DECIMAL128);
     		}

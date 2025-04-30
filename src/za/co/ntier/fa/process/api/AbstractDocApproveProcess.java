@@ -29,6 +29,9 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	@Parameter(name="ZZ_Approve_Rej_SAF")
 	protected String pApproveRejSAF;
 	
+	protected String currentDocAction;
+	protected String currentDocStatus;
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void prepare() {
@@ -36,6 +39,8 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 		poObj = (T)table.getPO(getRecord_ID(), get_TrxName());
 		initDocApproveObj();
 		now = new Timestamp(System.currentTimeMillis());
+		currentDocAction = docApprove.getZZ_DocAction();
+		currentDocStatus = docApprove.getZZ_DocStatus();
 	}
 	
 	/**
@@ -68,10 +73,6 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	protected void doSubmitDocForLineManage(){
 		if (docApprove.getLine_Manager_ID() <= 0)
 			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_DocApproveMissingLineManager"));
-		
-		if (docApprove.getLine_Manager_ID() != Env.getAD_User_ID(getCtx())) {
-			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_DocApproveWrongPermission"));
-		}
 		
 		docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Submitted);
 		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
@@ -144,11 +145,22 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 		// overrider on child to implement validation
 	}
 	
+	protected void defaultValidate() {
+		if (poObj.getCreatedBy() == docApprove.getLine_Manager_ID() ||
+				poObj.getCreatedBy() == docApprove.getZZ_Snr_Admin_Fin_ID()) {
+			
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_DocApproveAssignSelfApprove"));
+		}
+		
+		if (!IDocApprove.ZZ_DOCACTION_SubmitToLineManager.equals(currentDocAction) && poObj.getCreatedBy() == Env.getAD_User_ID(getCtx())) {
+			throw new AdempiereException(Msg.getMsg(getCtx(), "ZZ_DocApproveSelfApprove"));
+		}
+	}
+	
 	@Override
 	protected String doIt() throws Exception {
+		defaultValidate();
 		validateData();
-		String currentDocAction = docApprove.getZZ_DocAction();
-		String currentDocStatus = docApprove.getZZ_DocStatus();
 		if(docApprove.isZZ_AllowLineManageApproved() && 
 				IDocApprove.ZZ_DOCACTION_SubmitToLineManager.equals(currentDocAction)) {
 
