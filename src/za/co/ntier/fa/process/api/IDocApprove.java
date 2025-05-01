@@ -20,6 +20,9 @@ public interface IDocApprove {
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToSnrAdminFinance = "SS";
 	
+	/** Submit to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
+	
 	/** Approved = AP */
 	public static final String ZZ_DOCSTATUS_Approved = "AP";
 	/** Completed = CO */
@@ -37,7 +40,16 @@ public interface IDocApprove {
 	
 	public static final String DOCACTION_Approve = "AP";
 	
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_DOCSTATUS_ApprovedByManagerFinanceConsumables = "AC";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
+	
 	public static final int SNR_ADMIN_FIN_ROLE_ID = 1000003;
+	
+	public static final int MANAGER_FIN_CONSUMABLES_ROLE_ID = 1000010;
 	
 	public String getZZ_DocAction();
 	public void setZZ_DocAction(String docAction);
@@ -97,6 +109,15 @@ public interface IDocApprove {
 	 */
 	public void setZZ_Date_Completed (Timestamp completeDate);
 	
+	/** Set Date Manager Finance Consumables	  */
+	public void setZZ_Date_MFC_Approved (Timestamp ZZ_Date_MFC_Approved);
+	
+	/** Get Date Manager Finance Not Approved	  */
+	public Timestamp getZZ_Date_MFC_Not_Approved();
+	
+	/** Get Allow Mgr Finance Consumables Approval	  */
+	public boolean isZZ_AllowMgrFinConsumablesApproval();
+	
 	/**
 	 * get user who created/summit this document
 	 * 
@@ -104,7 +125,16 @@ public interface IDocApprove {
 	 */
 	public int getCreatedBy();
 	
-	public int get_Table_ID();
+	public int get_Table_ID();	
+
+	/** Set Manager Finance Consumables	  */
+	public void setZZ_Mgr_Fin_Consumables_ID (int ZZ_Mgr_Fin_Consumables_ID);
+
+	/** Get Manager Finance Consumables	  */
+	public int getZZ_Mgr_Fin_Consumables_ID();
+
+	public org.compiere.model.I_AD_User getZZ_Mgr_Fin_Consumables() throws RuntimeException;
+
 	
 	public default boolean isZZ_AllowLineManageApproved() {
 		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).isZZ_AllowLineManageApproved();
