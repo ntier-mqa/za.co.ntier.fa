@@ -118,6 +118,10 @@ public interface IDocApprove {
 	/** Get Allow Mgr Finance Consumables Approval	  */
 	public boolean isZZ_AllowMgrFinConsumablesApproval();
 	
+	/** Set Date Manager Finance Not Approved	  */
+	public void setZZ_Date_MFC_Not_Approved (Timestamp ZZ_Date_MFC_Not_Approved);
+
+	
 	/**
 	 * get user who created/summit this document
 	 * 
