@@ -60,4 +60,10 @@ public class MZZAssetRevaluation  extends X_ZZ_AssetRevaluation implements IDocA
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void setZZ_Date_MFC_Not_Approved(Timestamp ZZ_Date_MFC_Not_Approved) {
+		// TODO Auto-generated method stub
+		
+	}
 }

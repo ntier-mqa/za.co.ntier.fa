@@ -79,4 +79,10 @@ public class MZZAssetTransfer extends X_ZZ_AssetTransfer implements IDocApprove 
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void setZZ_Date_MFC_Not_Approved(Timestamp ZZ_Date_MFC_Not_Approved) {
+		// TODO Auto-generated method stub
+		
+	}
 }
