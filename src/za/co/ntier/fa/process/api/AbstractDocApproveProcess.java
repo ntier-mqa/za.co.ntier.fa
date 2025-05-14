@@ -228,7 +228,11 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 			MClient client = MClient.get(Env.getCtx());
 			
 			MUser from = MUser.get(Env.getCtx(), FROM_EMAIL_USER_ID);
-			msgBody = msgBody.replace("@documentLink@", AEnv.getZoomUrlTableUU(mailTemplate.getPO()));
+			
+			String extraForEmail = mailTemplate.getMailText2();
+			extraForEmail = extraForEmail.replace("@documentLink@", AEnv.getZoomUrlTableUU(mailTemplate.getPO()));
+			msgBody = msgBody + System.lineSeparator() + extraForEmail;
+			
 			if (!client.sendEMail(from, mUser, msgHeader, msgBody, null, mailTemplate.isHtml())) {
 				log.fine("Problem Sending Email.  Please contact Support");
 			}
