@@ -7,6 +7,7 @@ import org.adempiere.base.annotation.Parameter;
 import org.adempiere.exceptions.AdempiereException;
 import org.adempiere.model.POWrapper;
 import org.adempiere.webui.apps.AEnv;
+import org.apache.commons.lang3.StringUtils;
 import org.compiere.model.MClient;
 import org.compiere.model.MMailText;
 import org.compiere.model.MNote;
@@ -230,8 +231,10 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 			MUser from = MUser.get(Env.getCtx(), FROM_EMAIL_USER_ID);
 			
 			String extraForEmail = mailTemplate.getMailText2();
-			extraForEmail = extraForEmail.replace("@documentLink@", AEnv.getZoomUrlTableUU(mailTemplate.getPO()));
-			msgBody = msgBody + System.lineSeparator() + extraForEmail;
+			if (StringUtils.isNotBlank(extraForEmail)){
+				extraForEmail = extraForEmail.replace("@documentLink@", AEnv.getZoomUrlTableUU(mailTemplate.getPO()));
+				msgBody = msgBody + System.lineSeparator() + extraForEmail;
+			}
 			
 			if (!client.sendEMail(from, mUser, msgHeader, msgBody, null, mailTemplate.isHtml())) {
 				log.fine("Problem Sending Email.  Please contact Support");
