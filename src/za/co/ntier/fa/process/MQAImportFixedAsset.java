@@ -19,6 +19,8 @@ import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 
+import za.co.ntier.fa.model.I_I_FixedAsset;
+
 @org.adempiere.base.annotation.Process(name = "org.idempiere.fa.process.ImportFixedAsset")
 public class MQAImportFixedAsset extends SvrProcess{
 	/**	Client to be imported to		*/
@@ -47,11 +49,6 @@ public class MQAImportFixedAsset extends SvrProcess{
 			String name = para[i].getParameterName();
 			if (para[i].getParameter() == null)
 				;
-			else if (name.equals("AD_Client_ID"))
-				p_AD_Client_ID = ((BigDecimal)para[i].getParameter()).intValue();
-			else if (name.equals("AD_Org_ID"))
-				p_AD_Org_ID = ((BigDecimal)para[i].getParameter()).intValue();
-
 			else if (name.equals("DateAcct"))
 				p_DateAcct = ((Timestamp)para[i].getParameter());
 			else if (name.equals("DeleteOldImported"))
@@ -269,6 +266,8 @@ public class MQAImportFixedAsset extends SvrProcess{
 		if (no != 0)
 			log.warning ("No AssetDepreciationDate=" + no);
 		
+		
+		
 		if (p_IsValidateOnly)
 			return "Data Was Validated";
 
@@ -284,8 +283,31 @@ public class MQAImportFixedAsset extends SvrProcess{
 			while (rs.hasNext()) {
 				X_I_FixedAsset xfa = rs.next();
 				MIFixedAsset ifa = new MIFixedAsset(getCtx(), xfa.getI_FixedAsset_ID(), get_TrxName());
+				
+				if (ifa.getA_Accumulated_Depr().compareTo(BigDecimal.ZERO) < 0 ||
+						(ifa.getA_Asset_Cost().compareTo(BigDecimal.ZERO) == 0 && "Active".equalsIgnoreCase(ifa.get_ValueAsString(I_I_FixedAsset.COLUMNNAME_A_Asset_Status)))) {
+					ifa.setI_ErrorMsg("Error: cost = " + ifa.getA_Asset_Cost() + " - Accumulated = " + ifa.getA_Accumulated_Depr());
+					ifa.saveEx();
+					continue;
+				}
+				
 				try
 				{
+					if(ifa.getA_Asset_Cost().compareTo(BigDecimal.ZERO) == 0 && "Retired".equalsIgnoreCase(ifa.get_ValueAsString(I_I_FixedAsset.COLUMNNAME_A_Asset_Status))){
+						MAsset asset = new MAsset(ifa);
+						asset.setA_Asset_Status(MAsset.A_ASSET_STATUS_Retired);
+						asset.saveEx();
+						
+					
+						ifa.setA_Asset_ID(asset.getA_Asset_ID());
+						ifa.setI_IsImported(true);
+						ifa.setI_ErrorMsg(null);
+						ifa.setProcessed(true);
+						ifa.saveEx();
+						noInsert++;
+						continue;
+					}
+					
 					boolean isUpdate = ifa.getA_Asset_ID() > 0;
 					if (ifa.getA_Asset_ID() == 0)
 					{
@@ -388,7 +410,8 @@ public class MQAImportFixedAsset extends SvrProcess{
 					//	Process Asset Addition Based on Document Action
 					if (!assetAdd.processIt(ifa.getDocAction()))
 					{
-						ifa.setI_ErrorMsg("Failed Process Asset Addition");
+						ifa.setI_ErrorMsg(assetAdd.getProcessMsg());
+						ifa.saveEx();
 						assetAdd = null;
 						continue;
 					}
