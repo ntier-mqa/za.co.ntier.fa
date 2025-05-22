@@ -14,7 +14,7 @@ import org.compiere.util.Msg;
 import za.co.ntier.fa.model.I_ZZ_AssetRevaluation;
 import za.co.ntier.fa.model.MZZAssetChange;
 import za.co.ntier.fa.model.MZZAssetRevaluation;
-import za.co.ntier.fa.process.api.AbstractDocApproveProcess;
+import za.co.ntier.process.api.AbstractDocApproveProcess;
 
 @org.adempiere.base.annotation.Process(name="za.co.ntier.fa.process.AssetTrasferDocApproveProcess")
 public class AssetRevaluationDocApproveProcess extends AbstractDocApproveProcess<MZZAssetRevaluation> {

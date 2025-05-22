@@ -12,7 +12,7 @@ import org.compiere.process.ProcessInfo;
 import org.compiere.wf.MWorkflow;
 
 import za.co.ntier.fa.model.MZZAssetDisposal;
-import za.co.ntier.fa.process.api.AbstractDocApproveProcess;
+import za.co.ntier.process.api.AbstractDocApproveProcess;
 
 @org.adempiere.base.annotation.Process(name="za.co.ntier.fa.process.AssetDisposeDocApproveProcess")
 public class AssetDisposeDocApproveProcess extends AbstractDocApproveProcess<MZZAssetDisposal> {

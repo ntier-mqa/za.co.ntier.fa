@@ -7,9 +7,9 @@ import java.util.Properties;
 import org.compiere.model.I_AD_User;
 import org.compiere.util.Env;
 
-import za.co.ntier.fa.process.api.IDocApprove;
 import za.co.ntier.model.MZZConfigDocApproveFlow;
 import za.co.ntier.model.X_ZZConfigDocApproveFlow;
+import za.co.ntier.process.api.IDocApprove;
 
 public class MZZAssetTransfer extends X_ZZ_AssetTransfer implements IDocApprove {
 
