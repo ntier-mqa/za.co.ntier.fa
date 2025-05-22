@@ -1,7 +1,11 @@
 package za.co.ntier.fa.process.api;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 import org.adempiere.base.annotation.Parameter;
 import org.adempiere.exceptions.AdempiereException;
@@ -66,7 +70,7 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 		
 		Arrays.asList(MUserRoles.getOfRole(getCtx(), IDocApprove.SNR_ADMIN_FIN_ROLE_ID)).forEach(role -> {
 			if (role.isActive()) {
-				AbstractDocApproveProcess.sendNotification(role.getAD_User_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr(), get_TrxName());
+				AbstractDocApproveProcess.queueNotify(queueNotifis, role.getAD_User_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
 			}
 		});
 		
@@ -81,8 +85,8 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 		docApprove.setZZ_DocAction(IDocApprove.ZZ_DOCACTION_ApproveDoNotApprove);
 		docApprove.setZZ_Date_Submitted(now);
 		
-		AbstractDocApproveProcess.sendNotification(
-				docApprove.getLine_Manager_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestLine(), get_TrxName());
+		AbstractDocApproveProcess.queueNotify(queueNotifis, 
+				docApprove.getLine_Manager_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestLine());
 	}
 	
 	protected void doLineManageApprove() {
@@ -93,13 +97,13 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 				docApprove.setZZ_Date_Approved(now);
 				docApprove.setZZ_Date_LM_Approved(now);
 				docApprove.setZZ_Date_Completed(now);
-				AbstractDocApproveProcess.sendNotification(
-						docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved(), get_TrxName());
+				AbstractDocApproveProcess.queueNotify(queueNotifis, 
+						docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineApproved());
 			}
 		}else{
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedByLM);
 			docApprove.setZZ_Date_Not_Approved_by_LM(now);
-			AbstractDocApproveProcess.sendNotification(docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject(), get_TrxName());
+			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailLineReject());
 		}
 	}
 	
@@ -108,15 +112,15 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_Approved);
 			docApprove.setZZ_Date_Approved(now);
 			docApprove.setZZ_Snr_Admin_Fin_ID(Env.getAD_User_ID(getCtx()));
-			AbstractDocApproveProcess.sendNotification(
-					docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailSnrApproved(), get_TrxName());
+			AbstractDocApproveProcess.queueNotify(queueNotifis, 
+					docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailSnrApproved());
 		} else {
 			docApprove.setZZ_DocStatus(IDocApprove.ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance);
 			docApprove.setZZ_Date_Not_Approved_by_Snr_Adm_Fin(now);
 			if (docApprove.isZZ_AllowLineManageApproved())
-				AbstractDocApproveProcess.sendNotification(docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailSnrRejectLine(), get_TrxName());
+				AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getCreatedBy(), getTable_ID(), getRecord_ID(), docApprove.getZZMailSnrRejectLine());
 			
-			AbstractDocApproveProcess.sendNotification(docApprove.getLine_Manager_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailSnrRejectSubmitor(), get_TrxName());
+			AbstractDocApproveProcess.queueNotify(queueNotifis, docApprove.getLine_Manager_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailSnrRejectSubmitor());
 		}
 	}
 	
@@ -197,6 +201,8 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 		if (!Util.isEmpty(docApprove.getZZ_FinalWorkflowStateValue(), true) && docApprove.getZZ_FinalWorkflowStateValue().equals(docApprove.getZZ_DocStatus())) {
 			doLogic();
 		}
+		
+		sentNotify(queueNotifis, get_TrxName());
 		return null;
 	}
 	
@@ -207,39 +213,65 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	}
 	
 	public static final int FROM_EMAIL_USER_ID = MSysConfig.getIntValue("FROM_EMAIL_USER_ID",1000011);
-	public static void sendNotification(int mailToUserId, int tableID, int recordID, MMailText mailTemplate, String trxName) {
-		MUser mUser = new MUser(Env.getCtx(), mailToUserId, null);
-		mailTemplate.setUser(mUser);
-		String msgHeader = mailTemplate.getMailHeader();
-		String msgBody = mailTemplate.getMailText();
-		
-		if (X_AD_User.NOTIFICATIONTYPE_Notice.equals(mUser.getNotificationType()) ||
-				X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(mUser.getNotificationType())	) {
+	
+	protected List<Map<NotificationFields, Object>> queueNotifis = new ArrayList<>();
+	
+	public enum NotificationFields {
+	    MAIL_TO_USER_ID,
+	    TABLE_ID,
+	    RECORD_ID,
+	    MAIL_TEMPLATE;
+	}
+	
+	public static void queueNotify(List<Map<NotificationFields, Object>> mailQueues, int mailToUserId, int tableID, int recordID, MMailText mailTemplate) {
+		Map<NotificationFields, Object> sentNotifyInfo = new EnumMap<>(NotificationFields.class);
+		sentNotifyInfo.put(NotificationFields.MAIL_TO_USER_ID, mailToUserId);
+		sentNotifyInfo.put(NotificationFields.TABLE_ID, tableID);
+		sentNotifyInfo.put(NotificationFields.RECORD_ID, recordID);
+		sentNotifyInfo.put(NotificationFields.MAIL_TEMPLATE, mailTemplate);
+		mailQueues.add(sentNotifyInfo);
+	}
+	
+	public static void sentNotify(List<Map<NotificationFields, Object>> queueNotifis, String trxName) {
+		queueNotifis.forEach(sentNotifyInfo -> {
+			int mailToUserId = (int) sentNotifyInfo.get(NotificationFields.MAIL_TO_USER_ID);
+			int tableID = (int) sentNotifyInfo.get(NotificationFields.TABLE_ID);
+			int recordID = (int) sentNotifyInfo.get(NotificationFields.RECORD_ID);
+			MMailText mailTemplate = (MMailText) sentNotifyInfo.get(NotificationFields.MAIL_TEMPLATE);
 			
-			MNote note = new MNote(Env.getCtx(), 0, mUser.getAD_User_ID(),
-					tableID, recordID, 
-					msgHeader, msgBody, trxName);
+			MUser mUser = new MUser(Env.getCtx(), mailToUserId, null);
+			mailTemplate.setUser(mUser);
+			String msgHeader = mailTemplate.getMailHeader();
+			String msgBody = mailTemplate.getMailText();
 			
-			note.saveEx();
-		}
-		
-		if (X_AD_User.NOTIFICATIONTYPE_EMail.equals(mUser.getNotificationType()) ||
-				X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(mUser.getNotificationType())) {
-			
-			MClient client = MClient.get(Env.getCtx());
-			
-			MUser from = MUser.get(Env.getCtx(), FROM_EMAIL_USER_ID);
-			
-			String extraForEmail = mailTemplate.getMailText2();
-			if (StringUtils.isNotBlank(extraForEmail)){
-				extraForEmail = extraForEmail.replace("@documentLink@", AEnv.getZoomUrlTableUU(mailTemplate.getPO()));
-				msgBody = msgBody + System.lineSeparator() + extraForEmail;
+			if (X_AD_User.NOTIFICATIONTYPE_Notice.equals(mUser.getNotificationType()) ||
+					X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(mUser.getNotificationType())	) {
+				
+				MNote note = new MNote(Env.getCtx(), 0, mUser.getAD_User_ID(),
+						tableID, recordID, 
+						msgHeader, msgBody, trxName);
+				
+				note.saveEx();
 			}
 			
-			if (!client.sendEMail(from, mUser, msgHeader, msgBody, null, mailTemplate.isHtml())) {
-				log.fine("Problem Sending Email.  Please contact Support");
-			}
+			if (X_AD_User.NOTIFICATIONTYPE_EMail.equals(mUser.getNotificationType()) ||
+					X_AD_User.NOTIFICATIONTYPE_EMailPlusNotice.equals(mUser.getNotificationType())) {
+				
+				MClient client = MClient.get(Env.getCtx());
+				
+				MUser from = MUser.get(Env.getCtx(), FROM_EMAIL_USER_ID);
+				
+				String extraForEmail = mailTemplate.getMailText2();
+				if (StringUtils.isNotBlank(extraForEmail)){
+					extraForEmail = extraForEmail.replace("@documentLink@", AEnv.getZoomUrlTableUU(mailTemplate.getPO()));
+					msgBody = msgBody + System.lineSeparator() + extraForEmail;
+				}
+				
+				if (!client.sendEMail(from, mUser, msgHeader, msgBody, null, mailTemplate.isHtml())) {
+					log.fine("Problem Sending Email.  Please contact Support");
+				}
 
-		}
+			}
+		});
 	}
 }
