@@ -68,13 +68,7 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 		if (isBypassLineManage && docApprove.getZZ_Date_Submitted() == null)
 			docApprove.setZZ_Date_Submitted(now);
 		
-		Arrays.asList(MUserRoles.getOfRole(getCtx(), IDocApprove.SNR_ADMIN_FIN_ROLE_ID)).forEach(role -> {
-			if (role.isActive()) {
-				AbstractDocApproveProcess.queueNotify(queueNotifis, role.getAD_User_ID(), getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
-			}
-		});
-		
-		
+		queueNotifyForRole(queueNotifis, IDocApprove.SNR_ADMIN_FIN_ROLE_ID, getTable_ID(), getRecord_ID(), docApprove.getZZMailRequestSnr());
 	}
 	
 	protected void doSubmitDocForLineManage(){
@@ -223,13 +217,21 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	    MAIL_TEMPLATE;
 	}
 	
-	public static void queueNotify(List<Map<NotificationFields, Object>> mailQueues, int mailToUserId, int tableID, int recordID, MMailText mailTemplate) {
+	public static void queueNotifyForRole(List<Map<NotificationFields, Object>> queueNotifis, int mailRoleId, int tableID, int recordID, MMailText mailTemplate) {
+		Arrays.asList(MUserRoles.getOfRole(Env.getCtx(), mailRoleId)).forEach(role -> {
+			if (role.isActive()) {
+				AbstractDocApproveProcess.queueNotify(queueNotifis, role.getAD_User_ID(), tableID, recordID, mailTemplate);
+			}
+		});
+	}
+	
+	public static void queueNotify(List<Map<NotificationFields, Object>> queueNotifis, int mailToUserId, int tableID, int recordID, MMailText mailTemplate) {
 		Map<NotificationFields, Object> sentNotifyInfo = new EnumMap<>(NotificationFields.class);
 		sentNotifyInfo.put(NotificationFields.MAIL_TO_USER_ID, mailToUserId);
 		sentNotifyInfo.put(NotificationFields.TABLE_ID, tableID);
 		sentNotifyInfo.put(NotificationFields.RECORD_ID, recordID);
 		sentNotifyInfo.put(NotificationFields.MAIL_TEMPLATE, mailTemplate);
-		mailQueues.add(sentNotifyInfo);
+		queueNotifis.add(sentNotifyInfo);
 	}
 	
 	public static void sentNotify(List<Map<NotificationFields, Object>> queueNotifis, String trxName) {
