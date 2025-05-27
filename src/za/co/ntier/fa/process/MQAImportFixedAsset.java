@@ -18,6 +18,7 @@ import org.compiere.process.ProcessInfoParameter;
 import org.compiere.process.SvrProcess;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
+import org.compiere.util.Trx;
 
 import za.co.ntier.fa.model.I_I_FixedAsset;
 
@@ -266,13 +267,14 @@ public class MQAImportFixedAsset extends SvrProcess{
 		if (no != 0)
 			log.warning ("No AssetDepreciationDate=" + no);
 		
-		
-		
 		if (p_IsValidateOnly)
 			return "Data Was Validated";
 
 		int noInsert = 0;
 		int noUpdate = 0;
+		
+		Trx trx = Trx.get(get_TrxName(), false);
+		trx.setTimeout(20 * 60); // 20 minutes timeout);
 		
 		String whereClause = "NVL(I_IsImported,'N')='N'"+sqlCheck;
 		POResultSet<X_I_FixedAsset> rs = new Query(getCtx(), X_I_FixedAsset.Table_Name, whereClause, get_TrxName())
@@ -280,7 +282,17 @@ public class MQAImportFixedAsset extends SvrProcess{
 				.scroll();
 		try
 		{
+			long timmer = 10 * 60 * 1000; // 10 minutes
 			while (rs.hasNext()) {
+				long startProcessTime = System.currentTimeMillis();
+				if (trx.getTimeout() > 0) {
+					long since = System.currentTimeMillis() - trx.getStartTime().getTime();
+					if (since > (trx.getTimeout() * 1000 - timmer)) {
+						trx.setTimeout(trx.getTimeout() + 10 * 60); // extend timeout by 10 minutes);
+						log.warning("Transaction timeout extended by 10 minutes");
+					}
+				}
+				
 				X_I_FixedAsset xfa = rs.next();
 				MIFixedAsset ifa = new MIFixedAsset(getCtx(), xfa.getI_FixedAsset_ID(), get_TrxName());
 				
@@ -426,6 +438,9 @@ public class MQAImportFixedAsset extends SvrProcess{
 						noUpdate++;
 					else
 						noInsert++;
+					
+					long endProcessTime = System.currentTimeMillis();
+					log.warning(String.format("Processed rows %d in %d s", noInsert, (endProcessTime - startProcessTime)/1000));
 				}
 				catch (Exception e) {
 					ifa.setI_ErrorMsg(e.getLocalizedMessage());
