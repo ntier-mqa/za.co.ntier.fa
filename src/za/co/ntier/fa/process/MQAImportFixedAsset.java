@@ -1,6 +1,7 @@
 package za.co.ntier.fa.process;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.logging.Level;
 
@@ -37,7 +38,9 @@ public class MQAImportFixedAsset extends SvrProcess{
 	
 	/**	Delete old Imported				*/
 	private boolean			p_DeleteOldImported = true;
-
+	
+	String sqlCheck;
+	
 	/**
 	 *  Prepare - e.g., get Parameters.
 	 */
@@ -59,22 +62,24 @@ public class MQAImportFixedAsset extends SvrProcess{
 			else
 				MProcessPara.validateUnknownParameter(getProcessInfo().getAD_Process_ID(), para[i]);
 		}
-	}	//	prepare
-
-
-	/**
-	 *  Perform process.
-	 *  @return Message
-	 *  @throws Exception
-	 */
-	@Override
-	protected String doIt() throws java.lang.Exception
-	{
-		StringBuilder sql = null;
-		int no = 0;
+		
 		if(p_AD_Client_ID==0)
 			p_AD_Client_ID = Env.getAD_Client_ID(getCtx());
-		String sqlCheck = " AND AD_Client_ID=" + p_AD_Client_ID;
+		
+		sqlCheck = " AND AD_Client_ID=" + p_AD_Client_ID;
+	}	//	prepare
+
+	String createLocalTrx(String functionName) {
+		Trx trx = Trx.get(Trx.createTrxName("MQAImportFixedAsset." + functionName), true);
+		trx.setDisplayName(getClass().getName()+ "_" + functionName);
+		return trx.getTrxName();
+	}
+	
+	StringBuilder sql = null;
+	protected void fillData() throws SQLException {
+		String trxName = createLocalTrx("fillData");
+		
+		int no = 0;
 
 		//	****	Prepare	****
 
@@ -83,7 +88,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 		{
 			sql = new StringBuilder ("DELETE FROM "+X_I_FixedAsset.Table_Name
 				  + " WHERE I_IsImported='Y'").append (sqlCheck);
-			no = DB.executeUpdateEx(sql.toString(), get_TrxName());
+			no = DB.executeUpdateEx(sql.toString(), trxName);
 			if (log.isLoggable(Level.FINE)) log.fine("Delete Old Imported =" + no);
 		}
 		
@@ -99,7 +104,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 			  + " I_ErrorMsg = ' ',"
 			  + " I_IsImported = 'N' "
 			  + "WHERE I_IsImported<>'Y' OR I_IsImported IS NULL");
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.INFO)) log.info ("Reset=" + no);
 		
 		// Check if Org is Null or 0
@@ -108,7 +113,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 			+ "WHERE (AD_Org_ID IS NULL OR AD_Org_ID=0"
 			+ " OR EXISTS (SELECT * FROM AD_Org oo WHERE ifa.AD_Org_ID=oo.AD_Org_ID AND (oo.IsSummary='Y' OR oo.IsActive='N')))"
 			+ " AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (no != 0)
 			log.warning ("Invalid Org=" + no);
 		
@@ -116,7 +121,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 		sql = new StringBuilder ("UPDATE "+MIFixedAsset.Table_Name+" ifa "
 			+ "SET I_IsImported='E', I_ErrorMsg=I_ErrorMsg||'ERR=Name Is Mandatory, '"
 			+ "WHERE Name IS NULL AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (no != 0)
 			log.warning ("Invalid Name=" + no);
 		
@@ -126,7 +131,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 			  + " WHERE ifa.A_Asset_Group_Value=t.Name AND ifa.AD_Client_ID=t.AD_Client_ID) "
 			  + "WHERE A_Asset_Group_ID IS NULL AND A_Asset_Group_Value IS NOT NULL"
 			  + " AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.FINE)) log.fine("Set Asset Group from Value=" + no);
 		
 		// Check if Asset Group Have Asset Group Acct Record
@@ -135,7 +140,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 			+ "WHERE A_Asset_Group_ID IS NOT NULL AND A_Asset_Group_ID>0 " //@win change to AND from OR
 			+ "AND NOT EXISTS (SELECT 1 FROM A_Asset_Group_Acct aga WHERE ifa.A_Asset_Group_ID=aga.A_Asset_Group_ID) " //@win change to AND from OR
 			+ "AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (no != 0)
 			log.warning ("Invalid Asset Group=" + no);
 		
@@ -156,7 +161,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 			  + " WHERE ifa.BPartner_Value=t.Value AND ifa.AD_Client_ID=t.AD_Client_ID) "
 			  + "WHERE C_BPartnerSR_ID IS NULL AND BPartner_Value IS NOT NULL"
 			  + " AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.FINE)) log.fine("Set BP from Value=" + no);
 		
 		// City From Value
@@ -165,7 +170,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 			  + " WHERE ifa.C_City_Value=t.Name AND ifa.AD_Client_ID=t.AD_Client_ID) "
 			  + "WHERE C_City_ID IS NULL AND C_City_Value IS NOT NULL"
 			  + " AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.FINE)) log.fine("Set City from Value=" + no);
 		
 		// Product 
@@ -174,14 +179,14 @@ public class MQAImportFixedAsset extends SvrProcess{
 			  + " WHERE ifa.ProductValue=t.Value AND ifa.AD_Client_ID=t.AD_Client_ID) "
 			  + "WHERE M_Product_ID IS NULL AND ProductValue IS NOT NULL"
 			  + " AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.FINE)) log.fine("Set Product from Value=" + no);
 		
 		sql = new StringBuilder ("UPDATE "+MIFixedAsset.Table_Name+" ifa "
 			  + "SET I_IsImported='E', I_ErrorMsg=I_ErrorMsg||'ERR=Invalid Product, ' "
 			  + "WHERE M_Product_ID IS NULL AND ProductValue IS NOT NULL"
 			  + " AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (no != 0)
 			log.warning ("Invalid Product=" + no);
 		
@@ -193,7 +198,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 			+ "WHERE ifa.M_Product_ID=p.M_Product_ID "
 			+ "AND (pc.A_Asset_Group_ID=0 OR pc.A_Asset_Group_ID IS NULL)) "
 			+ "AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (no != 0)
 			log.warning ("Invalid Product Category=" + no);
 				
@@ -203,7 +208,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 			  + " WHERE ifa.LocatorValue=t.Value AND ifa.AD_Client_ID=t.AD_Client_ID) "
 			  + "WHERE M_Locator_ID IS NULL AND LocatorValue IS NOT NULL"
 			  + " AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.FINE)) log.fine("Set Locator from Value=" + no);
 		
 		//	Currency From ISO Code
@@ -212,20 +217,20 @@ public class MQAImportFixedAsset extends SvrProcess{
 			.append(" WHERE c.ISO_Code=ifa.ISO_Code AND c.AD_Client_ID IN (0,ifa.AD_Client_ID)) ")
 			.append("WHERE C_Currency_ID IS NULL AND ISO_Code IS NOT NULL")
 			.append(" AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.FINE)) log.fine("Set Currency from ISO=" + no);
 		sql = new StringBuilder ("UPDATE "+MIFixedAsset.Table_Name+" ifa ")
 			.append("SET C_Currency_ID=(SELECT a.C_Currency_ID FROM C_AcctSchema a")
 			.append(" WHERE a.C_AcctSchema_ID=ifa.C_AcctSchema_ID AND a.AD_Client_ID=ifa.AD_Client_ID)")
 			.append("WHERE C_Currency_ID IS NULL AND ISO_Code IS NULL")
 			.append(" AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.FINE)) log.fine("Set Default Currency=" + no);
 		sql = new StringBuilder ("UPDATE "+MIFixedAsset.Table_Name+" ifa ")
 			.append("SET I_IsImported='E', I_ErrorMsg=I_ErrorMsg||'ERR=Invalid Currency, '")
 			.append("WHERE (C_Currency_ID IS NULL OR C_Currency_ID=0)")
 			.append(" AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (no != 0)
 			log.warning ("Invalid Currency=" + no);
 			
@@ -235,13 +240,13 @@ public class MQAImportFixedAsset extends SvrProcess{
 			.append(" WHERE ifa.AcctSchemaName=a.Name AND ifa.AD_Client_ID=a.AD_Client_ID) ")
 			.append("WHERE C_AcctSchema_ID IS NULL AND AcctSchemaName IS NOT NULL")
 			.append(" AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.FINE)) log.fine("Set AcctSchema from Name=" + no);
 		sql = new StringBuilder ("UPDATE "+MIFixedAsset.Table_Name+" ifa ")
 			.append("SET C_AcctSchema_ID=(SELECT c.C_AcctSchema1_ID FROM AD_ClientInfo c WHERE c.AD_Client_ID=ifa.AD_Client_ID) ")
 			.append("WHERE C_AcctSchema_ID IS NULL AND AcctSchemaName IS NULL")
 			.append(" AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (log.isLoggable(Level.FINE)) log.fine("Set AcctSchema from Client=" + no);
 		//	Error AcctSchema
 		sql = new StringBuilder ("UPDATE "+MIFixedAsset.Table_Name+" ifa ")
@@ -249,23 +254,50 @@ public class MQAImportFixedAsset extends SvrProcess{
 			.append("WHERE (C_AcctSchema_ID IS NULL OR C_AcctSchema_ID=0")
 			.append(" OR NOT EXISTS (SELECT * FROM C_AcctSchema a WHERE ifa.AD_Client_ID=a.AD_Client_ID))")
 			.append(" AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (no != 0)
 			log.warning ("Invalid AcctSchema=" + no);
 		
 		sql = new StringBuilder ("UPDATE "+MIFixedAsset.Table_Name+" ifa ")
 			.append("SET I_IsImported='E', I_ErrorMsg=I_ErrorMsg||'ERR=AssetServiceDate Is Mandatory, '")
 			.append("WHERE AssetServiceDate IS NULL AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (no != 0)
 			log.warning ("No AssetServiceDate=" + no);
 		
 		sql = new StringBuilder ("UPDATE "+MIFixedAsset.Table_Name+" ifa ")
 			.append("SET I_IsImported='E', I_ErrorMsg=I_ErrorMsg||'ERR=AssetDepreciationDate Is Mandatory, '")
 			.append("WHERE AssetDepreciationDate IS NULL AND I_IsImported<>'Y'").append (sqlCheck);
-		no = DB.executeUpdate(sql.toString(), get_TrxName());
+		no = DB.executeUpdate(sql.toString(), trxName);
 		if (no != 0)
 			log.warning ("No AssetDepreciationDate=" + no);
+		
+		closeTrx(trxName, false);
+	}
+	
+	void closeTrx(String trxName, boolean slient) throws SQLException {
+		Trx tran = Trx.get(trxName, false);
+		try {
+			tran.commit(true);
+		} catch (SQLException e) {
+			if (!slient) {
+				throw e;
+			}
+		}finally {
+			tran.close();
+		}	
+	}
+	
+	
+	/**
+	 *  Perform process.
+	 *  @return Message
+	 *  @throws Exception
+	 */
+	@Override
+	protected String doIt() throws java.lang.Exception
+	{
+		fillData();
 		
 		if (p_IsValidateOnly)
 			return "Data Was Validated";
@@ -273,28 +305,37 @@ public class MQAImportFixedAsset extends SvrProcess{
 		int noInsert = 0;
 		int noUpdate = 0;
 		
-		Trx trx = Trx.get(get_TrxName(), false);
-		trx.setTimeout(20 * 60); // 20 minutes timeout);
-		
 		String whereClause = "NVL(I_IsImported,'N')='N'"+sqlCheck;
-		POResultSet<X_I_FixedAsset> rs = new Query(getCtx(), X_I_FixedAsset.Table_Name, whereClause, get_TrxName())
+		POResultSet<X_I_FixedAsset> rs = new Query(getCtx(), X_I_FixedAsset.Table_Name, whereClause, null)
 				.setOrderBy(X_I_FixedAsset.COLUMNNAME_I_FixedAsset_ID)
 				.scroll();
+		String trxBatchName = null;
+		Trx trxBatch = null;
+		Trx trxMain = Trx.get(get_TrxName(), false);
 		try
 		{
 			long timmer = 10 * 60 * 1000; // 10 minutes
+			int batchSize = 0;
+			int rowsProcessed = 0;
+			
 			while (rs.hasNext()) {
-				long startProcessTime = System.currentTimeMillis();
-				if (trx.getTimeout() > 0) {
-					long since = System.currentTimeMillis() - trx.getStartTime().getTime();
-					if (since > (trx.getTimeout() * 1000 - timmer)) {
-						trx.setTimeout(trx.getTimeout() + 10 * 60); // extend timeout by 10 minutes);
-						log.warning("Transaction timeout extended by 10 minutes");
-					}
+				if (batchSize > 100) {
+					closeTrx(trxBatchName, false);
+					batchSize = 0;
+					trxBatch = null;
+					trxBatchName = null;
 				}
 				
+				if (batchSize == 0) {
+					trxBatchName = createLocalTrx("import fix Asset:" + rowsProcessed);
+					trxBatch = Trx.get(trxBatchName, false);
+					trxBatch.setTimeout(20*60);
+				}
+				
+				long startProcessTime = System.currentTimeMillis();
+				
 				X_I_FixedAsset xfa = rs.next();
-				MIFixedAsset ifa = new MIFixedAsset(getCtx(), xfa.getI_FixedAsset_ID(), get_TrxName());
+				MIFixedAsset ifa = new MIFixedAsset(getCtx(), xfa.getI_FixedAsset_ID(), trxBatchName);
 				
 				if (ifa.getA_Accumulated_Depr().compareTo(BigDecimal.ZERO) < 0 ||
 						(ifa.getA_Asset_Cost().compareTo(BigDecimal.ZERO) == 0 && "Active".equalsIgnoreCase(ifa.get_ValueAsString(I_I_FixedAsset.COLUMNNAME_A_Asset_Status)))) {
@@ -305,6 +346,9 @@ public class MQAImportFixedAsset extends SvrProcess{
 				
 				try
 				{
+					rowsProcessed++;
+					batchSize++;
+					
 					if(ifa.getA_Asset_Cost().compareTo(BigDecimal.ZERO) == 0 && "Retired".equalsIgnoreCase(ifa.get_ValueAsString(I_I_FixedAsset.COLUMNNAME_A_Asset_Status))){
 						MAsset asset = new MAsset(ifa);
 						asset.setA_Asset_Status(MAsset.A_ASSET_STATUS_Retired);
@@ -325,7 +369,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 					{
 						//	check for existing active asset by name and inventory no
 						sql = new StringBuilder("SELECT A_Asset_ID FROM A_Asset WHERE IsActive='Y' AND Name=? AND InventoryNo=?");
-						int A_Asset_ID = DB.getSQLValue(get_TrxName(), sql.toString(), ifa.getName(), ifa.getInventoryNo());
+						int A_Asset_ID = DB.getSQLValue(trxBatchName, sql.toString(), ifa.getName(), ifa.getInventoryNo());
 						if (A_Asset_ID > 0)
 						{
 							isUpdate = true;
@@ -341,6 +385,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 					if (assetAdd == null)
 					{
 						ifa.setI_ErrorMsg("Failed Create Assets");
+						ifa.saveEx();
 						assetAdd = null;
 						continue;
 					}
@@ -349,8 +394,8 @@ public class MQAImportFixedAsset extends SvrProcess{
 					
 					if (isUpdate)
 					{
-						MAsset asset = MAsset.get(getCtx(), ifa.getA_Asset_ID(), get_TrxName());
-						for (MAssetGroupAcct assetgrpacct :  MAssetGroupAcct.forA_Asset_Group_ID(getCtx(), asset.getA_Asset_Group_ID(), null, get_TrxName()))
+						MAsset asset = MAsset.get(getCtx(), ifa.getA_Asset_ID(), trxBatchName);
+						for (MAssetGroupAcct assetgrpacct :  MAssetGroupAcct.forA_Asset_Group_ID(getCtx(), asset.getA_Asset_Group_ID(), null, trxBatchName))
 						{			
 							if (assetgrpacct.getAD_Org_ID() == 0 || assetgrpacct.getAD_Org_ID() == asset.getAD_Org_ID()) 
 							{
@@ -374,7 +419,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 						}
 					}
 					
-					for (MDepreciationWorkfile assetworkFile : MDepreciationWorkfile.forA_Asset_ID(getCtx(), ifa.getA_Asset_ID(), get_TrxName()))
+					for (MDepreciationWorkfile assetworkFile : MDepreciationWorkfile.forA_Asset_ID(getCtx(), ifa.getA_Asset_ID(), trxBatchName))
 					{
 						if (assetworkFile.getC_AcctSchema_ID() != ifa.getC_AcctSchema_ID())
 							continue;
@@ -440,7 +485,25 @@ public class MQAImportFixedAsset extends SvrProcess{
 						noInsert++;
 					
 					long endProcessTime = System.currentTimeMillis();
-					log.warning(String.format("Processed rows %d in %d s", noInsert, (endProcessTime - startProcessTime)/1000));
+					log.warning(String.format("Processed rows %d in %.2f s", noInsert, (endProcessTime - startProcessTime)/1000f));
+				
+					if (trxBatch.getTimeout() > 0 && trxBatch.getStartTime().getTime() > 0) {
+						long trxBatchSpendTime = System.currentTimeMillis() - trxBatch.getStartTime().getTime();
+						
+						if (trxBatchSpendTime > (trxBatch.getTimeout() * 1000 - timmer)) {
+							trxBatch.setTimeout(trxBatch.getTimeout() + 10 * 60); // extend timeout by 10 minutes
+							log.warning(String.format("Transaction timeout extended by 10 minutes: record:%d trxName:%s ", rowsProcessed, trxBatchName));
+						}
+					}
+					
+					if (trxMain.getTimeout() > 0 && trxMain.getStartTime().getTime() > 0) {
+						long trxMainSpendTime = System.currentTimeMillis() - trxMain.getStartTime().getTime();
+						
+						if (trxMainSpendTime > (trxMain.getTimeout() * 1000 - timmer)) {
+							trxMain.setTimeout(trxMain.getTimeout() + 10 * 60); // extend timeout by 10 minutes
+							log.warning(String.format("Transaction timeout extended by 10 minutes: record:%d trxName:%s ", rowsProcessed, get_TrxName()));
+						}
+					}
 				}
 				catch (Exception e) {
 					ifa.setI_ErrorMsg(e.getLocalizedMessage());
@@ -450,12 +513,18 @@ public class MQAImportFixedAsset extends SvrProcess{
 		}
 		finally
 		{
+			if (trxBatch != null && trxBatch.isActive()) {
+				closeTrx(trxBatchName, false);
+				trxBatch = null;
+				trxBatchName = null;
+			}
+			
 			DB.close(rs); rs = null;
 			//
 			sql = new StringBuilder ("UPDATE "+X_I_FixedAsset.Table_Name)
 				.append(" SET I_IsImported='N', Updated=SysDate ")
 				.append("WHERE I_IsImported<>'Y'").append(sqlCheck);
-			no = DB.executeUpdate(sql.toString(), get_TrxName());
+			int no = DB.executeUpdate(sql.toString(), get_TrxName());
 			addLog (0, null, new BigDecimal (no), "@Errors@");
 			addLog (0, null, new BigDecimal (noInsert), "@A_Asset_ID@: @Inserted@");
 			addLog (0, null, new BigDecimal (noUpdate), "@A_Asset_ID@: @Updated@");
