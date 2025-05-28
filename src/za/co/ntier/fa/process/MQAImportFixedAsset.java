@@ -329,7 +329,6 @@ public class MQAImportFixedAsset extends SvrProcess{
 				if (batchSize == 0) {
 					trxBatchName = createLocalTrx("import fix Asset:" + rowsProcessed);
 					trxBatch = Trx.get(trxBatchName, false);
-					trxBatch.setTimeout(20*60);
 				}
 				
 				long startProcessTime = System.currentTimeMillis();
@@ -487,7 +486,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 					long endProcessTime = System.currentTimeMillis();
 					log.warning(String.format("Processed rows %d in %.2f s", noInsert, (endProcessTime - startProcessTime)/1000f));
 				
-					if (trxBatch.getTimeout() > 0 && trxBatch.getStartTime().getTime() > 0) {
+					if (trxBatch.getTimeout() > 0 && batchSize > 100 && trxBatch.getStartTime().getTime() > 0) {
 						long trxBatchSpendTime = System.currentTimeMillis() - trxBatch.getStartTime().getTime();
 						
 						if (trxBatchSpendTime > (trxBatch.getTimeout() * 1000 - timmer)) {
@@ -496,7 +495,7 @@ public class MQAImportFixedAsset extends SvrProcess{
 						}
 					}
 					
-					if (trxMain.getTimeout() > 0 && trxMain.getStartTime().getTime() > 0) {
+					if (trxMain.getTimeout() > 0 && batchSize > 100 && trxMain.getStartTime().getTime() > 0) {
 						long trxMainSpendTime = System.currentTimeMillis() - trxMain.getStartTime().getTime();
 						
 						if (trxMainSpendTime > (trxMain.getTimeout() * 1000 - timmer)) {
