@@ -85,4 +85,46 @@ public class MZZAssetTransfer extends X_ZZ_AssetTransfer implements IDocApprove 
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void setZZ_Date_SDL_Approved(Timestamp ZZ_Date_SDL_Approved) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_SDL_Approved() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_SDL_Not_Approved(Timestamp ZZ_Date_SDL_Not_Approved) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_SDL_Not_Approved() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_SDL_Fin_Mgr_ID(int ZZ_SDL_Fin_Mgr_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_SDL_Fin_Mgr_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public I_AD_User getZZ_SDL_Fin_Mgr() throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

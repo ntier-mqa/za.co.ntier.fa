@@ -19,6 +19,7 @@ public interface IDocApprove {
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToSnrAdminFinance = "SS";
+	public static final String ZZ_DOCACTION_SubmitToSDLFinanceMgr = "SD";
 	
 	/** Submit to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
@@ -33,8 +34,10 @@ public interface IDocApprove {
 	public static final String ZZ_DOCSTATUS_InProgress = "IP";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
+	public static final String ZZ_DOCSTATUS_NotApprovedBySDL = "ND";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	public static final String ZZ_DOCSTATUS_NotApprovedBySDLFinanceMgr = "ND";
 	/** Submitted = SU */
 	public static final String ZZ_DOCSTATUS_Submitted = "SU";
 	
@@ -46,6 +49,8 @@ public interface IDocApprove {
 	public static final String ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
 	/** Submitted to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
+	
+	public static final String ZZ_DOCSTATUS_SubmittedToSDLFinanceMgr = "SD";
 	
 	public static final int SNR_ADMIN_FIN_ROLE_ID = 1000003;
 	
@@ -120,6 +125,18 @@ public interface IDocApprove {
 	
 	/** Set Date Manager Finance Not Approved	  */
 	public void setZZ_Date_MFC_Not_Approved (Timestamp ZZ_Date_MFC_Not_Approved);
+	
+	/** Set Date Approved By SDL Finance Manager	  */
+	public void setZZ_Date_SDL_Approved (Timestamp ZZ_Date_SDL_Approved);
+
+	/** Get Date Approved By SDL Finance Manager	  */
+	public Timestamp getZZ_Date_SDL_Approved();
+
+	/** Set Date Not Approved By the SDL Finance Mgr	  */
+	public void setZZ_Date_SDL_Not_Approved (Timestamp ZZ_Date_SDL_Not_Approved);
+
+	/** Get Date Not Approved By the SDL Finance Mgr	  */
+	public Timestamp getZZ_Date_SDL_Not_Approved();
 
 	
 	/**
@@ -138,6 +155,14 @@ public interface IDocApprove {
 	public int getZZ_Mgr_Fin_Consumables_ID();
 
 	public org.compiere.model.I_AD_User getZZ_Mgr_Fin_Consumables() throws RuntimeException;
+	
+	/** Set SDL Finance Mgr	  */
+	public void setZZ_SDL_Fin_Mgr_ID (int ZZ_SDL_Fin_Mgr_ID);
+
+	/** Get SDL Finance Mgr	  */
+	public int getZZ_SDL_Fin_Mgr_ID();
+	
+	public org.compiere.model.I_AD_User getZZ_SDL_Fin_Mgr() throws RuntimeException;
 
 	
 	public default boolean isZZ_AllowLineManageApproved() {
@@ -147,7 +172,7 @@ public interface IDocApprove {
 	public default  boolean isZZ_AllowSnrAdminFinanceApproved() {
 		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).isZZ_AllowSnrAdminFinanceApproved();
 	}
-
+	
 	public default String getZZ_FinalWorkflowStateValue() {
 		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZ_FinalWorkflowStateValue();
 	}
