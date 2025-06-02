@@ -54,6 +54,8 @@ public interface IDocApprove {
 	
 	public static final int SNR_ADMIN_FIN_ROLE_ID = 1000003;
 	
+	public static final int SDL_FIN_MGR_ROLE_ID = 1000005;
+	
 	public static final int MANAGER_FIN_CONSUMABLES_ROLE_ID = 1000010;
 	
 	public String getZZ_DocAction();
