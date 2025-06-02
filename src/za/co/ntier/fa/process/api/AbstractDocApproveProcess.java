@@ -35,6 +35,8 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	protected String pApproveRejSAF;
 	@Parameter(name="ZZ_Approve_Rej_MFC")  // Manager Finance Consumables
 	protected String pApprove_Rej_MFC;
+	@Parameter(name="ZZ_Approve_Rej_SDL")  // SDL Fin Manager Consumables
+	protected String pApprove_Rej_SDL;
 	
 	protected String currentDocAction;
 	protected String currentDocStatus;
