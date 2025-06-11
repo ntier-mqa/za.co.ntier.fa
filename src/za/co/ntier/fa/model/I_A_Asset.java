@@ -825,12 +825,12 @@ public interface I_A_Asset
     /** Column name Value */
     public static final String COLUMNNAME_Value = "Value";
 
-	/** Set Asset Number.
+	/** Set Search Key.
 	  * Search key for the record in the format required - must be unique
 	  */
 	public void setValue (String Value);
 
-	/** Get Asset Number.
+	/** Get Search Key.
 	  * Search key for the record in the format required - must be unique
 	  */
 	public String getValue();
@@ -865,6 +865,24 @@ public interface I_A_Asset
 
 	/** Get Asset Region	  */
 	public int getZZAssetRegion_ID();
+
+    /** Column name ZZVerifiedDate */
+    public static final String COLUMNNAME_ZZVerifiedDate = "ZZVerifiedDate";
+
+	/** Set Verified Date	  */
+	public void setZZVerifiedDate (Timestamp ZZVerifiedDate);
+
+	/** Get Verified Date	  */
+	public Timestamp getZZVerifiedDate();
+
+    /** Column name ZZVerifiedStatus */
+    public static final String COLUMNNAME_ZZVerifiedStatus = "ZZVerifiedStatus";
+
+	/** Set Verified Status	  */
+	public void setZZVerifiedStatus (String ZZVerifiedStatus);
+
+	/** Get Verified Status	  */
+	public String getZZVerifiedStatus();
 
     /** Column name ZZ_ManufacturedDate */
     public static final String COLUMNNAME_ZZ_ManufacturedDate = "ZZ_ManufacturedDate";

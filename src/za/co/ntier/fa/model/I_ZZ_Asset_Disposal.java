@@ -198,6 +198,26 @@ public interface I_ZZ_Asset_Disposal
 	  */
 	public String getValue();
 
+    /** Column name ZZAssetVerifyBatch_ID */
+    public static final String COLUMNNAME_ZZAssetVerifyBatch_ID = "ZZAssetVerifyBatch_ID";
+
+	/** Set Asset Verify Batch	  */
+	public void setZZAssetVerifyBatch_ID (int ZZAssetVerifyBatch_ID);
+
+	/** Get Asset Verify Batch	  */
+	public int getZZAssetVerifyBatch_ID();
+
+	public I_ZZAssetVerifyBatch getZZAssetVerifyBatch() throws RuntimeException;
+
+    /** Column name ZZShowAcctPost */
+    public static final String COLUMNNAME_ZZShowAcctPost = "ZZShowAcctPost";
+
+	/** Set Show Acct Post	  */
+	public void setZZShowAcctPost (String ZZShowAcctPost);
+
+	/** Get Show Acct Post	  */
+	public String getZZShowAcctPost();
+
     /** Column name ZZ_Asset_Disposal_ID */
     public static final String COLUMNNAME_ZZ_Asset_Disposal_ID = "ZZ_Asset_Disposal_ID";
 

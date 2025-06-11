@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="za.co.ntier.fa.osgi.component.MqaProcessParameterListener">
+   <property name="service.ranking" type="Integer" value="2"/>
+   <property name="ProcessClass" value="91ffcb73-897c-4898-9d9f-e498ccef2a77"/>
+   <property name="ColumnName" value="*"/>
+   <service>
+      <provide interface="org.adempiere.webui.apps.IProcessParameterListener"/>
+   </service>
+   <implementation class="za.co.ntier.fa.osgi.component.MqaProcessParameterListener"/>
+</scr:component>
