@@ -58,6 +58,10 @@ public interface IDocApprove {
 	
 	public static final int MANAGER_FIN_CONSUMABLES_ROLE_ID = 1000010;
 	
+	public static final int IT_MGR_ROLE_ID = 1000015;
+	
+	public static final int IT_ADMIN_ROLE_ID = 1000016;
+	
 	public String getZZ_DocAction();
 	public void setZZ_DocAction(String docAction);
 	
@@ -140,7 +144,57 @@ public interface IDocApprove {
 	/** Get Date Not Approved By the SDL Finance Mgr	  */
 	public Timestamp getZZ_Date_SDL_Not_Approved();
 
-	
+	/** Set Date Account Created By IT Admin	  */
+	public void setZZ_Date_Account_Created (Timestamp ZZ_Date_Account_Created);
+
+	/** Get Date Account Created By IT Admin	  */
+	public Timestamp getZZ_Date_Account_Created();
+
+	/** Set Date Approved by IT Manager	  */
+	public void setZZ_Date_IT_Manager_Approved (Timestamp ZZ_Date_IT_Manager_Approved);
+
+	/** Get Date Approved by IT Manager	  */
+	public Timestamp getZZ_Date_IT_Manager_Approved();
+
+	/** Set Date Rejected by IT Manager	  */
+	public void setZZ_Date_IT_Manager_Rejected (Timestamp ZZ_Date_IT_Manager_Rejected);
+
+	/** Get Date Rejected by IT Manager	  */
+	public Timestamp getZZ_Date_IT_Manager_Rejected();
+
+	/** Set Manager Approved	  */
+	public void setZZ_Date_Manager_Approved (Timestamp ZZ_Date_Manager_Approved);
+
+	/** Get Manager Approved	  */
+	public Timestamp getZZ_Date_Manager_Approved();
+
+	/** Set Date Rejected By Manager	  */
+	public void setZZ_Date_Manager_Rejected (Timestamp ZZ_Date_Manager_Rejected);
+
+	/** Get Date Rejected By Manager	  */
+	public Timestamp getZZ_Date_Manager_Rejected();
+
+	public void setZZ_IT_Admin_ID (int ZZ_IT_Admin_ID);
+
+	/** Get IT Admin	  */
+	public int getZZ_IT_Admin_ID();
+
+	public org.compiere.model.I_AD_User getZZ_IT_Admin() throws RuntimeException;
+
+	/** Set IT Manager 	  */
+	public void setZZ_IT_Manager_ID (int ZZ_IT_Manager_ID);
+
+	/** Get IT Manager 	  */
+	public int getZZ_IT_Manager_ID();
+
+	public org.compiere.model.I_AD_User getZZ_IT_Manager() throws RuntimeException;
+
+
+	/** Set Manager	  */
+	public void setZZ_Manager_ID (int ZZ_Manager_ID);
+
+	/** Get Manager	  */
+	public int getZZ_Manager_ID();
 	/**
 	 * get user who created/summit this document
 	 * 
