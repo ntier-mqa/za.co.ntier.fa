@@ -235,4 +235,88 @@ public class MZZAssetTransfer extends X_ZZ_AssetTransfer implements IDocApprove 
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public void setZZ_Recommender_ID(int ZZ_Recommender_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_Recommender_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setZZ_Exec_Approver_ID(int ZZ_Exec_Approver_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_Exec_Approver_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setStartDate(Timestamp StartDate) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getStartDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setEndDate(Timestamp EndDate) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getEndDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Recommended(Timestamp ZZ_Date_Recommended) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Recommended() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Not_Approved(Timestamp ZZ_Date_Not_Approved) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Not_Approved() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setZZ_Date_Not_Recommended(Timestamp ZZ_Date_Not_Recommended) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Timestamp getZZ_Date_Not_Recommended() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
