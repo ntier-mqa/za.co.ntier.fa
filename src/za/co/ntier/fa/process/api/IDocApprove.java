@@ -9,7 +9,7 @@ import org.compiere.model.PO;
 import za.co.ntier.model.MZZConfigDocApproveFlow;
 
 public interface IDocApprove {
-	/** Approve/Do Not Approve = AP */
+	/** Approve/Do Not Approve  = AP */
 	public static final String ZZ_DOCACTION_ApproveDoNotApprove = "AP";
 	/** Complete = CO */
 	public static final String ZZ_DOCACTION_Complete = "CO";
