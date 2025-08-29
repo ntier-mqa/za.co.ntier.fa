@@ -9,7 +9,7 @@ import org.compiere.model.PO;
 import za.co.ntier.model.MZZConfigDocApproveFlow;
 
 public interface IDocApprove {
-	/** Approve/Do Not Approve = AP */
+	/** Approve/Do Not Approve  = AP */
 	public static final String ZZ_DOCACTION_ApproveDoNotApprove = "AP";
 	/** Complete = CO */
 	public static final String ZZ_DOCACTION_Complete = "CO";
@@ -52,6 +52,8 @@ public interface IDocApprove {
 	
 	public static final String ZZ_DOCSTATUS_SubmittedToSDLFinanceMgr = "SD";
 	
+	public static final String ZZ_DOCSTATUS_NOT_RECOMMENDED = "NR";
+	
 	public static final int SNR_ADMIN_FIN_ROLE_ID = 1000003;
 	
 	public static final int SDL_FIN_MGR_ROLE_ID = 1000005;
@@ -62,6 +64,27 @@ public interface IDocApprove {
 	
 	public static final int IT_ADMIN_ROLE_ID = 1000016;
 	
+<<<<<<< HEAD
+=======
+	
+
+	// ACTIONS
+	public static final String ZZ_DOCACTION_SubmitOpenWindow = "SU";   // reuse SU for "Submit"
+	public static final String ZZ_DOCACTION_Recommend       = "RE";   // Recommender clicks "Recommend"
+	public static final String ZZ_DOCACTION_ApproveExec     = "AE";   // Exec (COO/EMCS) clicks "Approve"
+
+	// STATUSES
+
+	public static final String ZZ_DOCSTATUS_Recommended  = "RC";  // <-- NEW
+	
+	public static final String ZZ_DOCSTATUS_NotApproved  = "NA";  // generic catch-all (optional)
+
+	// OPTIONAL (role ids from your comment)
+	public static final int ROLE_CO0_ID        = 1000026;
+	public static final int ROLE_EMCS_ID       = 1000027;
+	public static final int ROLE_SNR_MGR_SPU   = 1000021;
+	
+>>>>>>> feature/martins_changes
 	public String getZZ_DocAction();
 	public void setZZ_DocAction(String docAction);
 	
@@ -219,7 +242,58 @@ public interface IDocApprove {
 	public int getZZ_SDL_Fin_Mgr_ID();
 	
 	public org.compiere.model.I_AD_User getZZ_SDL_Fin_Mgr() throws RuntimeException;
+	
+	/** Set Recommender	  */
+	public void setZZ_Recommender_ID (int ZZ_Recommender_ID);
 
+	/** Get Recommender	  */
+	public int getZZ_Recommender_ID();
+	
+	/** Set Exec Approver	  */
+	public void setZZ_Exec_Approver_ID (int ZZ_Exec_Approver_ID);
+
+	/** Get Exec Approver	  */
+	public int getZZ_Exec_Approver_ID();
+
+	
+	/** Set Start Date.
+	  * First effective day (inclusive)
+	  */
+	public void setStartDate (Timestamp StartDate);
+
+	/** Get Start Date.
+	  * First effective day (inclusive)
+	  */
+	public Timestamp getStartDate();
+
+	/** Set End Date.
+	  * Last effective date (inclusive)
+	  */
+	public void setEndDate (Timestamp EndDate);
+
+	/** Get End Date.
+	  * Last effective date (inclusive)
+	  */
+	public Timestamp getEndDate();
+	
+	
+	/** Set Date Recommended	  */
+	public void setZZ_Date_Recommended (Timestamp ZZ_Date_Recommended);
+
+	/** Get Date Recommended	  */
+	public Timestamp getZZ_Date_Recommended();
+	
+	/** Set Date Not Approved	  */
+	public void setZZ_Date_Not_Approved (Timestamp ZZ_Date_Not_Approved);
+
+	/** Get Date Not Approved	  */
+	public Timestamp getZZ_Date_Not_Approved();
+	
+	/** Set Date Not Recommended	  */
+	public void setZZ_Date_Not_Recommended (Timestamp ZZ_Date_Not_Recommended);
+
+	/** Get Date Not Recommended	  */
+	public Timestamp getZZ_Date_Not_Recommended();
 	
 	public default boolean isZZ_AllowLineManageApproved() {
 		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).isZZ_AllowLineManageApproved();

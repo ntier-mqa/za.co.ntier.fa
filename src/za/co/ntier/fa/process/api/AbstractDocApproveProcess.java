@@ -37,6 +37,10 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	protected String pApprove_Rej_MFC;
 	@Parameter(name="ZZ_Approve_Rej_SDL")  // SDL Fin Manager Consumables
 	protected String pApprove_Rej_SDL;
+	@Parameter(name="ZZ_Recommend_Rej_Snr_SPU")
+	protected String pRecommend_Rej_Snr_SPU;
+	@Parameter(name="ZZ_Approve_Rej_COO_EMCS")
+	protected String pApprove_Rej_COO_EMCS;
 	
 	protected String currentDocAction;
 	protected String currentDocStatus;
