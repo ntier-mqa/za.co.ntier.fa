@@ -64,9 +64,6 @@ public interface IDocApprove {
 	
 	public static final int IT_ADMIN_ROLE_ID = 1000016;
 	
-<<<<<<< HEAD
-=======
-	
 
 	// ACTIONS
 	public static final String ZZ_DOCACTION_SubmitOpenWindow = "SU";   // reuse SU for "Submit"
@@ -83,8 +80,6 @@ public interface IDocApprove {
 	public static final int ROLE_CO0_ID        = 1000026;
 	public static final int ROLE_EMCS_ID       = 1000027;
 	public static final int ROLE_SNR_MGR_SPU   = 1000021;
-	
->>>>>>> feature/martins_changes
 	public String getZZ_DocAction();
 	public void setZZ_DocAction(String docAction);
 	

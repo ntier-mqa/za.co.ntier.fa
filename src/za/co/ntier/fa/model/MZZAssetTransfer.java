@@ -235,8 +235,6 @@ public class MZZAssetTransfer extends X_ZZ_AssetTransfer implements IDocApprove 
 		// TODO Auto-generated method stub
 		return 0;
 	}
-<<<<<<< HEAD
-=======
 
 	@Override
 	public void setZZ_Recommender_ID(int ZZ_Recommender_ID) {
@@ -321,5 +319,4 @@ public class MZZAssetTransfer extends X_ZZ_AssetTransfer implements IDocApprove 
 		// TODO Auto-generated method stub
 		return null;
 	}
->>>>>>> feature/martins_changes
 }
