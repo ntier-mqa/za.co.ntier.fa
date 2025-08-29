@@ -41,6 +41,9 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	protected String currentDocAction;
 	protected String currentDocStatus;
 	
+	@Parameter(name="ZZ_ByPassDocApprove")  // Manager Finance Consumables
+	protected boolean byPassDocApprove = false; // used for bypass doc approve process, when called from other process like Asset Dispose/Transfer
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void prepare() {
@@ -162,6 +165,11 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 	
 	@Override
 	protected String doIt() throws Exception {
+		if (byPassDocApprove) {
+			doLogic();
+			return null;
+		}
+		
 		defaultValidate();
 		validateData();
 		if(docApprove.isZZ_AllowLineManageApproved() && 

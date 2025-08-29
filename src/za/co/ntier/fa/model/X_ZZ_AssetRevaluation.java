@@ -34,7 +34,7 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250422L;
+	private static final long serialVersionUID = 20250610L;
 
     /** Standard Constructor */
     public X_ZZ_AssetRevaluation (Properties ctx, int ZZ_AssetRevaluation_ID, String trxName)
@@ -134,9 +134,9 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 	public void setA_Asset_ID (int A_Asset_ID)
 	{
 		if (A_Asset_ID < 1)
-			set_ValueNoCheck (COLUMNNAME_A_Asset_ID, null);
+			set_Value (COLUMNNAME_A_Asset_ID, null);
 		else
-			set_ValueNoCheck (COLUMNNAME_A_Asset_ID, Integer.valueOf(A_Asset_ID));
+			set_Value (COLUMNNAME_A_Asset_ID, Integer.valueOf(A_Asset_ID));
 	}
 
 	/** Get Asset.
@@ -438,6 +438,8 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 	public static final String ZZ_DOCACTION_Complete = "CO";
 	/** Final Approval/Do not Approve = FA */
 	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
+	/** Submit to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
 	/** Set Document Action.
@@ -456,6 +458,8 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 		return (String)get_Value(COLUMNNAME_ZZ_DocAction);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_DOCSTATUS_ApprovedByManagerFinanceConsumables = "AC";
 	/** Approved = AP */
 	public static final String ZZ_DOCSTATUS_Approved = "AP";
 	/** Completed = CO */
@@ -464,10 +468,14 @@ public class X_ZZ_AssetRevaluation extends PO implements I_ZZ_AssetRevaluation, 
 	public static final String ZZ_DOCSTATUS_Draft = "DR";
 	/** In Progress = IP */
 	public static final String ZZ_DOCSTATUS_InProgress = "IP";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
 	/** Submitted = SU */
 	public static final String ZZ_DOCSTATUS_Submitted = "SU";
 	/** Set Document Status.

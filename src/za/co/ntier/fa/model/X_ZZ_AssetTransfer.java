@@ -32,7 +32,7 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250422L;
+	private static final long serialVersionUID = 20250610L;
 
     /** Standard Constructor */
     public X_ZZ_AssetTransfer (Properties ctx, int ZZ_AssetTransfer_ID, String trxName)
@@ -226,9 +226,9 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 	public void setLine_Manager_ID (int Line_Manager_ID)
 	{
 		if (Line_Manager_ID < 1)
-			set_ValueNoCheck (COLUMNNAME_Line_Manager_ID, null);
+			set_Value (COLUMNNAME_Line_Manager_ID, null);
 		else
-			set_ValueNoCheck (COLUMNNAME_Line_Manager_ID, Integer.valueOf(Line_Manager_ID));
+			set_Value (COLUMNNAME_Line_Manager_ID, Integer.valueOf(Line_Manager_ID));
 	}
 
 	/** Get Line Manager.
@@ -360,6 +360,33 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 	public int getZZAssetRegion_ID()
 	{
 		Integer ii = (Integer)get_Value(COLUMNNAME_ZZAssetRegion_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
+	public I_ZZAssetVerifyBatch getZZAssetVerifyBatch() throws RuntimeException
+	{
+		return (I_ZZAssetVerifyBatch)MTable.get(getCtx(), I_ZZAssetVerifyBatch.Table_ID)
+			.getPO(getZZAssetVerifyBatch_ID(), get_TrxName());
+	}
+
+	/** Set Asset Verify Batch.
+		@param ZZAssetVerifyBatch_ID Asset Verify Batch
+	*/
+	public void setZZAssetVerifyBatch_ID (int ZZAssetVerifyBatch_ID)
+	{
+		if (ZZAssetVerifyBatch_ID < 1)
+			set_ValueNoCheck (COLUMNNAME_ZZAssetVerifyBatch_ID, null);
+		else
+			set_ValueNoCheck (COLUMNNAME_ZZAssetVerifyBatch_ID, Integer.valueOf(ZZAssetVerifyBatch_ID));
+	}
+
+	/** Get Asset Verify Batch.
+		@return Asset Verify Batch	  */
+	public int getZZAssetVerifyBatch_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZAssetVerifyBatch_ID);
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
@@ -525,6 +552,8 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 	public static final String ZZ_DOCACTION_Complete = "CO";
 	/** Final Approval/Do not Approve = FA */
 	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
+	/** Submit to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
 	/** Set Document Action.
@@ -543,6 +572,8 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 		return (String)get_Value(COLUMNNAME_ZZ_DocAction);
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_DOCSTATUS_ApprovedByManagerFinanceConsumables = "AC";
 	/** Approved = AP */
 	public static final String ZZ_DOCSTATUS_Approved = "AP";
 	/** Completed = CO */
@@ -551,10 +582,14 @@ public class X_ZZ_AssetTransfer extends PO implements I_ZZ_AssetTransfer, I_Pers
 	public static final String ZZ_DOCSTATUS_Draft = "DR";
 	/** In Progress = IP */
 	public static final String ZZ_DOCSTATUS_InProgress = "IP";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
 	/** Submitted = SU */
 	public static final String ZZ_DOCSTATUS_Submitted = "SU";
 	/** Set Document Status.
