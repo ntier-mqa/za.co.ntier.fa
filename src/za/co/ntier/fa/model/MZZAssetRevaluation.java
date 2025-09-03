@@ -300,4 +300,16 @@ public class MZZAssetRevaluation  extends X_ZZ_AssetRevaluation implements IDocA
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void setZZ_Snr_Mgr_LP_ID(int ZZ_Snr_Mgr_LP_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_Snr_Mgr_LP_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

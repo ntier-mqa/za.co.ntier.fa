@@ -21,6 +21,7 @@ public interface IDocApprove {
 	public static final String ZZ_DOCACTION_SubmitToSnrAdminFinance = "SS";
 	public static final String ZZ_DOCACTION_SubmitToSDLFinanceMgr = "SD";
 	public static final String ZZ_DOCACTION_SubmitToRecommender = "SR";
+	public static final String ZZ_DOCACTION_SubmitToSnrMgrLP = "SL";
 	
 	/** Submit to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
@@ -293,6 +294,13 @@ public interface IDocApprove {
 
 	/** Get Date Not Recommended	  */
 	public Timestamp getZZ_Date_Not_Recommended();
+	
+	
+	/** Set Snr Mgr LP	  */
+	public void setZZ_Snr_Mgr_LP_ID (int ZZ_Snr_Mgr_LP_ID);
+
+	/** Get Snr Mgr LP	  */
+	public int getZZ_Snr_Mgr_LP_ID();
 	
 	public default boolean isZZ_AllowLineManageApproved() {
 		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).isZZ_AllowLineManageApproved();

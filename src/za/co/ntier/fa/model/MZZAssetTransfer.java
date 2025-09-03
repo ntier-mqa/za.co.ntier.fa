@@ -319,4 +319,16 @@ public class MZZAssetTransfer extends X_ZZ_AssetTransfer implements IDocApprove 
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void setZZ_Snr_Mgr_LP_ID(int ZZ_Snr_Mgr_LP_ID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public int getZZ_Snr_Mgr_LP_ID() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
