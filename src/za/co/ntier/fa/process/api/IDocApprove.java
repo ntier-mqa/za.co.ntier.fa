@@ -20,6 +20,7 @@ public interface IDocApprove {
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToSnrAdminFinance = "SS";
 	public static final String ZZ_DOCACTION_SubmitToSDLFinanceMgr = "SD";
+	public static final String ZZ_DOCACTION_SubmitToRecommender = "SR";
 	
 	/** Submit to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
@@ -80,6 +81,9 @@ public interface IDocApprove {
 	public static final int ROLE_CO0_ID        = 1000026;
 	public static final int ROLE_EMCS_ID       = 1000027;
 	public static final int ROLE_SNR_MGR_SPU   = 1000021;
+	public static final int ROLE_MANAGER_LP       = 1000022;  // TODO: put your AD_Role_ID
+	public static final int ROLE_MANAGER_SPU      = 1000029;
+	public static final int ROLE_SNR_MANAGER_LP   = 1000019;  // TODO
 	public String getZZ_DocAction();
 	public void setZZ_DocAction(String docAction);
 	
