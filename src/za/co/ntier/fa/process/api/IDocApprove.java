@@ -82,9 +82,20 @@ public interface IDocApprove {
 	public static final int ROLE_CO0_ID        = 1000026;
 	public static final int ROLE_EMCS_ID       = 1000027;
 	public static final int ROLE_SNR_MGR_SPU   = 1000021;
-	public static final int ROLE_MANAGER_LP       = 1000022;  // TODO: put your AD_Role_ID
+	public static final int ROLE_MANAGER_LP_OPS       = 1000022;  
+	public static final int ROLE_MANAGER_LP_PROJECTS       = 1000032;  
 	public static final int ROLE_MANAGER_SPU      = 1000029;
-	public static final int ROLE_SNR_MANAGER_LP   = 1000019;  // TODO
+	public static final int ROLE_MANAGER_SRU      = 9999999;
+	public static final int ROLE_MANAGER_QA      = 9999999;
+	public static final int ROLE_SNR_MANAGER_LP_OPS   = 1000019; 
+	public static final int ROLE_SNR_MANAGER_QA   = 9999999; 
+	public static final int ROLE_SNR_MANAGER_SRU   = 9999999; 
+	public static final int ROLE_SNR_MANAGER_LP_PROJECTS   = 1000030; 
+	public static final int[] ROLES_MANAGER_LP      = {1000022,1000032};
+	public static final int[] ROLES_SNR_MANAGER_LP      = {1000019,1000030};
+	public static final int[] ORGS_SNR_MANAGER_LP      = {1000010,1000013};  // LP Ops , LP Projects
+	
+	
 	public String getZZ_DocAction();
 	public void setZZ_DocAction(String docAction);
 	
@@ -301,6 +312,13 @@ public interface IDocApprove {
 
 	/** Get Snr Mgr LP	  */
 	public int getZZ_Snr_Mgr_LP_ID();
+	
+	public void setAD_Org_ID (int AD_Org_ID);
+
+	/** Get Unit.
+	  * Organizational entity within tenant
+	  */
+	public int getAD_Org_ID();
 	
 	public default boolean isZZ_AllowLineManageApproved() {
 		return MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).isZZ_AllowLineManageApproved();
