@@ -85,11 +85,11 @@ public interface IDocApprove {
 	public static final int ROLE_MANAGER_LP_OPS       = 1000022;  
 	public static final int ROLE_MANAGER_LP_PROJECTS       = 1000032;  
 	public static final int ROLE_MANAGER_SPU      = 1000029;
-	public static final int ROLE_MANAGER_SRU      = 9999999;
-	public static final int ROLE_MANAGER_QA      = 9999999;
+	public static final int ROLE_MANAGER_SRU      = 1000033;
+	public static final int ROLE_MANAGER_QA      = 1000034;
 	public static final int ROLE_SNR_MANAGER_LP_OPS   = 1000019; 
-	public static final int ROLE_SNR_MANAGER_QA   = 9999999; 
-	public static final int ROLE_SNR_MANAGER_SRU   = 9999999; 
+	public static final int ROLE_SNR_MANAGER_QA   = 1000031; 
+	public static final int ROLE_SNR_MANAGER_SRU   = 1000036; 
 	public static final int ROLE_SNR_MANAGER_LP_PROJECTS   = 1000030; 
 	public static final int[] ROLES_MANAGER_LP      = {1000022,1000032};
 	public static final int[] ROLES_SNR_MANAGER_LP      = {1000019,1000030};
