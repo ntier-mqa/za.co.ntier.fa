@@ -210,7 +210,7 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 			doLogic();
 		}
 		
-		sentNotify(queueNotifis, get_TrxName());
+		sentNotify(queueNotifis, docApprove,get_TrxName());
 		return null;
 	}
 	
@@ -248,7 +248,7 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 		queueNotifis.add(sentNotifyInfo);
 	}
 	
-	public static void sentNotify(List<Map<NotificationFields, Object>> queueNotifis, String trxName) {
+	public static void sentNotify(List<Map<NotificationFields, Object>> queueNotifis, IDocApprove docApprove,String trxName) {
 		queueNotifis.forEach(sentNotifyInfo -> {
 			int mailToUserId = (int) sentNotifyInfo.get(NotificationFields.MAIL_TO_USER_ID);
 			int tableID = (int) sentNotifyInfo.get(NotificationFields.TABLE_ID);
@@ -266,6 +266,7 @@ public abstract class AbstractDocApproveProcess<T extends PO> extends SvrProcess
 				MNote note = new MNote(Env.getCtx(), 0, mUser.getAD_User_ID(),
 						tableID, recordID, 
 						msgHeader, msgBody, trxName);
+				note.setAD_Org_ID(docApprove.getAD_Org_ID());
 				
 				note.saveEx();
 			}
