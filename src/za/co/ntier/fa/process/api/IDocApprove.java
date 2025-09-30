@@ -92,8 +92,9 @@ public interface IDocApprove {
 	public static final int ROLE_SNR_MANAGER_SRU   = 1000036; 
 	public static final int ROLE_SNR_MANAGER_LP_PROJECTS   = 1000030; 
 	public static final int[] ROLES_MANAGER_LP      = {1000022,1000032};
-	public static final int[] ROLES_SNR_MANAGER_LP      = {1000019,1000030};
-	public static final int[] ORGS_SNR_MANAGER_LP      = {1000010,1000013};  // LP Ops , LP Projects
+	public static final int[] ROLES_SNR_MANAGER_LP      = {1000019,1000030,1000036,1000031}; // snr mgrs ops, projects , SRU , QA
+	public static final int[] ORGS_SNR_MANAGER_LP       = {1000010,1000013,1000015,1000009};  // LP Ops , LP Projects, SRU , QA
+	public static final String[] ZZ_DOCACTIONS          = {"SO","SP","SS","SQ"};
 	
 	
 	public String getZZ_DocAction();
