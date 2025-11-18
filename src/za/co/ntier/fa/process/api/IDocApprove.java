@@ -315,6 +315,14 @@ public interface IDocApprove {
 	public int getZZ_Snr_Mgr_LP_ID();
 	
 	public void setAD_Org_ID (int AD_Org_ID);
+	
+	/** Set Submitted By	  */
+	public void setZZ_Submitter_ID (int ZZ_Submitter_ID);
+
+	/** Get Submitted By	  */
+	public int getZZ_Submitter_ID();
+	
+	
 
 	/** Get Unit.
 	  * Organizational entity within tenant
