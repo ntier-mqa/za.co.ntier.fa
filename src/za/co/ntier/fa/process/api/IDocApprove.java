@@ -53,6 +53,9 @@ public interface IDocApprove {
 	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
 	
 	public static final String ZZ_DOCSTATUS_SubmittedToSDLFinanceMgr = "SD";
+
+	/** Submitted to Snr Admin Finance = SA */
+	public static final String ZZ_DOCSTATUS_SubmittedToSnrAdminFinance = "SA";
 	
 	public static final String ZZ_DOCSTATUS_NOT_RECOMMENDED = "NR";
 	
@@ -85,7 +88,7 @@ public interface IDocApprove {
 	public static final int ROLE_MANAGER_LP_OPS       = 1000022;  
 	public static final int ROLE_MANAGER_LP_PROJECTS       = 1000032;  
 	public static final int ROLE_MANAGER_SPU      = 1000029;
-	public static final int ROLE_MANAGER_SRU      = 1000033;
+	public static final int ROLE_MANAGER_SRU      = 1000037;
 	public static final int ROLE_MANAGER_QA      = 1000034;
 	public static final int ROLE_SNR_MANAGER_LP_OPS   = 1000019; 
 	public static final int ROLE_SNR_MANAGER_QA   = 1000031; 
