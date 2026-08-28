@@ -31,7 +31,7 @@ public class X_ZZConfigDocApproveFlow extends PO implements I_ZZConfigDocApprove
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250418L;
+	private static final long serialVersionUID = 20260828L;
 
     /** Standard Constructor */
     public X_ZZConfigDocApproveFlow (Properties ctx, int ZZConfigDocApproveFlow_ID, String trxName)
@@ -254,6 +254,33 @@ public class X_ZZConfigDocApproveFlow extends PO implements I_ZZConfigDocApprove
 		return ii.intValue();
 	}
 
+	public org.compiere.model.I_R_MailText getZZMailRequestFCM() throws RuntimeException
+	{
+		return (org.compiere.model.I_R_MailText)MTable.get(getCtx(), org.compiere.model.I_R_MailText.Table_ID)
+			.getPO(getZZMailRequestFCM_ID(), get_TrxName());
+	}
+
+	/** Set Mail Request Fin Consumables Manager.
+		@param ZZMailRequestFCM_ID Mail Request Fin Consumables Manager
+	*/
+	public void setZZMailRequestFCM_ID (int ZZMailRequestFCM_ID)
+	{
+		if (ZZMailRequestFCM_ID < 1)
+			set_Value (COLUMNNAME_ZZMailRequestFCM_ID, null);
+		else
+			set_Value (COLUMNNAME_ZZMailRequestFCM_ID, Integer.valueOf(ZZMailRequestFCM_ID));
+	}
+
+	/** Get Mail Request Fin Consumables Manager.
+		@return Mail Request Fin Consumables Manager	  */
+	public int getZZMailRequestFCM_ID()
+	{
+		Integer ii = (Integer)get_Value(COLUMNNAME_ZZMailRequestFCM_ID);
+		if (ii == null)
+			 return 0;
+		return ii.intValue();
+	}
+
 	public org.compiere.model.I_R_MailText getZZMailRequestLine() throws RuntimeException
 	{
 		return (org.compiere.model.I_R_MailText)MTable.get(getCtx(), org.compiere.model.I_R_MailText.Table_ID)
@@ -440,20 +467,106 @@ public class X_ZZConfigDocApproveFlow extends PO implements I_ZZConfigDocApprove
 		return false;
 	}
 
+	/** Approved By Manager Finance Consumables = AC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_ApprovedByManagerFinanceConsumables = "AC";
 	/** Approved = AP */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Approved = "AP";
+	/** Prepared for CEO = CF */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_PreparedForCEO = "CF";
 	/** Completed = CO */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Completed = "CO";
 	/** Draft = DR */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Draft = "DR";
+	/** Error Importing = EE */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_ErrorImporting = "EE";
+	/** Validation Error = ER */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_ValidationError = "ER";
+	/** Evaluated = EV */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Evaluated = "EV";
+	/** Importing = IG */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Importing = "IG";
+	/** Imported = IM */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Imported = "IM";
 	/** In Progress = IP */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_InProgress = "IP";
+	/** Not Recommended By Senior Mgr SDR = N1 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Recommended By Senior Mgr Finance = N2 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotRecommendedBySeniorMgrFinance = "N2";
+	/** Not Recommended By COO = N3 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotRecommendedByCOO = "N3";
+	/** Not Recommended By CFO = N4 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotRecommendedByCFO = "N4";
+	/** Not Recommended By CEO = N5 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotRecommendedByCEO = "N5";
+	/** Not Approved by Snr Manager = NA */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedBySnrManager = "NA";
+	/** Not Approved By Manager Finance Consumables = NC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByITManager = "NI";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedByLM = "NL";
+	/** Not Approved = NP */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApproved = "NP";
+	/** Not Recommended = NR */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotApprovedBySnrAdminFinance = "NS";
+	/** Not Verified = NV */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_NotVerified = "NV";
+	/** Pending = PE */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Pending = "PE";
+	/** Query = QR */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Query = "QR";
+	/** Recommended By Senior Mgr Finance = R1 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedBySeniorMgrFinance = "R1";
+	/** Recommended By COO = R2 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedByCOO = "R2";
+	/** Recommended By CFO = R3 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedByCFO = "R3";
+	/** Recommended By CEO = R4 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedByCEO = "R4";
+	/** Recommended By Officer - QA Accreditation = R5 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedByOfficer_QAAccreditation = "R5";
+	/** Recommended By Mgr - QA Accreditation = R6 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedByMgr_QAAccreditation = "R6";
+	/** Recommended By Snr Mgr QA = R7 */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedBySnrMgrQA = "R7";
+	/** Recommended for Approval = RA */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedForApproval = "RA";
+	/** Recommended = RC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Recommended = "RC";
+	/** Recommended By Senior Mgr SDR = RD */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedBySeniorMgrSDR = "RD";
+	/** Recommended for Evaluation = RE */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_RecommendedForEvaluation = "RE";
+	/** Submitted to Snr Admin Finance = SA */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToSnrAdminFinance = "SA";
+	/** Submitted to Manager Finance Consumables = SC */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToManagerFinanceConsumables = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_SubmittedToITAdmin = "ST";
 	/** Submitted = SU */
 	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Submitted = "SU";
+	/** Transfer Out = TO */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_TransferOut = "TO";
+	/** Updated by SDR Admin = UA */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_UpdatedBySDRAdmin = "UA";
+	/** Uploaded = UP */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Uploaded = "UP";
+	/** Delinked = UnSdfOrg */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Delinked = "UnSdfOrg";
+	/** Validating = VA */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Validating = "VA";
+	/** Verified = VE */
+	public static final String ZZ_FINALWORKFLOWSTATEVALUE_Verified = "VE";
 	/** Set Final Workflow State Value.
 		@param ZZ_FinalWorkflowStateValue Value set to ZZ_DocStatus when reach to end of approve workflow
 	*/

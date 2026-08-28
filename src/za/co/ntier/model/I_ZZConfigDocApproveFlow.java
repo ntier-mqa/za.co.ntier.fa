@@ -32,7 +32,7 @@ public interface I_ZZConfigDocApproveFlow
     /** TableName=ZZConfigDocApproveFlow */
     public static final String Table_Name = "ZZConfigDocApproveFlow";
 
-    /** AD_Table_ID=1000019 */
+    /** AD_Table_ID=1000018 */
     public static final int Table_ID = MTable.getTable_ID(Table_Name);
 
     KeyNamePair Model = new KeyNamePair(Table_ID, Table_Name);
@@ -54,12 +54,12 @@ public interface I_ZZConfigDocApproveFlow
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
 
-	/** Set Organization.
+	/** Set Unit.
 	  * Organizational entity within tenant
 	  */
 	public void setAD_Org_ID (int AD_Org_ID);
 
-	/** Get Organization.
+	/** Get Unit.
 	  * Organizational entity within tenant
 	  */
 	public int getAD_Org_ID();
@@ -188,6 +188,17 @@ public interface I_ZZConfigDocApproveFlow
 	public int getZZMailLineReject_ID();
 
 	public org.compiere.model.I_R_MailText getZZMailLineReject() throws RuntimeException;
+
+    /** Column name ZZMailRequestFCM_ID */
+    public static final String COLUMNNAME_ZZMailRequestFCM_ID = "ZZMailRequestFCM_ID";
+
+	/** Set Mail Request Fin Consumables Manager	  */
+	public void setZZMailRequestFCM_ID (int ZZMailRequestFCM_ID);
+
+	/** Get Mail Request Fin Consumables Manager	  */
+	public int getZZMailRequestFCM_ID();
+
+	public org.compiere.model.I_R_MailText getZZMailRequestFCM() throws RuntimeException;
 
     /** Column name ZZMailRequestLine_ID */
     public static final String COLUMNNAME_ZZMailRequestLine_ID = "ZZMailRequestLine_ID";
