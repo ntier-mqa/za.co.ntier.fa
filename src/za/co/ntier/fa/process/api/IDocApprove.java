@@ -359,6 +359,10 @@ public interface IDocApprove {
 	public default MMailText getZZMailRequestSnr() {
 		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailRequestSnr());
 	}
+
+	public default MMailText getZZMailRequestFCM() {
+		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailRequestFCM());
+	}
 	
 	public default MMailText getZZMailSnrApproved() {
 		return setPOForMail(MZZConfigDocApproveFlow.getByDocTableID(get_Table_ID()).getZZMailSnrApproved());
