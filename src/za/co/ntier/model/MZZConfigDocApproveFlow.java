@@ -7,6 +7,9 @@ import org.compiere.model.MTable;
 import org.compiere.util.CCache;
 import org.compiere.util.Env;
 
+import za.co.ntier.api.model.I_ZZConfigDocApproveFlow;
+import za.co.ntier.api.model.X_ZZConfigDocApproveFlow;
+
 public class MZZConfigDocApproveFlow extends X_ZZConfigDocApproveFlow{
 	
 	public MZZConfigDocApproveFlow(Properties ctx, int ZZConfigDocApproveFlowID, String trxName,

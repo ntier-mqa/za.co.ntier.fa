@@ -63,7 +63,7 @@ public interface IDocApprove {
 	
 	public static final int SDL_FIN_MGR_ROLE_ID = 1000005;
 	
-	public static final int MANAGER_FIN_CONSUMABLES_ROLE_ID = 1000010;
+	public static final int MGR_ADMIN_FINANCE_ROLE_ID = 1000004;
 	
 	public static final int IT_MGR_ROLE_ID = 1000015;
 	
