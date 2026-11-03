@@ -32,7 +32,7 @@ public class X_ZZ_Asset_Disposal extends PO implements I_ZZ_Asset_Disposal, I_Pe
 	/**
 	 *
 	 */
-	private static final long serialVersionUID = 20250610L;
+	private static final long serialVersionUID = 20261029L;
 
     /** Standard Constructor */
     public X_ZZ_Asset_Disposal (Properties ctx, int ZZ_Asset_Disposal_ID, String trxName)
@@ -167,6 +167,21 @@ public class X_ZZ_Asset_Disposal extends PO implements I_ZZ_Asset_Disposal, I_Pe
 		if (ii == null)
 			 return 0;
 		return ii.intValue();
+	}
+
+	/** Set Disposed Date.
+		@param A_Disposed_Date Disposed Date
+	*/
+	public void setA_Disposed_Date (Timestamp A_Disposed_Date)
+	{
+		set_Value (COLUMNNAME_A_Disposed_Date, A_Disposed_Date);
+	}
+
+	/** Get Disposed Date.
+		@return Disposed Date	  */
+	public Timestamp getA_Disposed_Date()
+	{
+		return (Timestamp)get_Value(COLUMNNAME_A_Disposed_Date);
 	}
 
 	/** Set Account Date.
@@ -428,16 +443,50 @@ public class X_ZZ_Asset_Disposal extends PO implements I_ZZ_Asset_Disposal, I_Pe
 		return (Timestamp)get_Value(COLUMNNAME_ZZ_Date_Submitted);
 	}
 
+	/** Exec Approve = AE */
+	public static final String ZZ_DOCACTION_ExecApprove = "AE";
 	/** Approve/Do Not Approve = AP */
 	public static final String ZZ_DOCACTION_ApproveDoNotApprove = "AP";
 	/** Complete = CO */
 	public static final String ZZ_DOCACTION_Complete = "CO";
+	/** Evaluate = EV */
+	public static final String ZZ_DOCACTION_Evaluate = "EV";
 	/** Final Approval/Do not Approve = FA */
 	public static final String ZZ_DOCACTION_FinalApprovalDoNotApprove = "FA";
+	/** PrepareCEO = PC */
+	public static final String ZZ_DOCACTION_PrepareCEO = "PC";
+	/** Refer Back = RB */
+	public static final String ZZ_DOCACTION_ReferBack = "RB";
+	/** Recommend = RE */
+	public static final String ZZ_DOCACTION_Recommend = "RE";
+	/** Re-Submit = RS */
+	public static final String ZZ_DOCACTION_Re_Submit = "RS";
+	/** Submit = S1 */
+	public static final String ZZ_DOCACTION_Submit = "S1";
+	/** System Only (No manual action) = S2 */
+	public static final String ZZ_DOCACTION_SystemOnlyNoManualAction = "S2";
 	/** Submit to Manager Finance Consumables = SC */
 	public static final String ZZ_DOCACTION_SubmitToManagerFinanceConsumables = "SC";
+	/** Submit to SDL Finance Mgr = SD */
+	public static final String ZZ_DOCACTION_SubmitToSDLFinanceMgr = "SD";
+	/** Submit to Snr Mgr LP = SL */
+	public static final String ZZ_DOCACTION_SubmitToSnrMgrLP = "SL";
+	/** Submit to Snr Mgr Ops = SO */
+	public static final String ZZ_DOCACTION_SubmitToSnrMgrOps = "SO";
+	/** Submit to Snr Mgr Projects = SP */
+	public static final String ZZ_DOCACTION_SubmitToSnrMgrProjects = "SP";
+	/** Submit to Snr Mgr QA = SQ */
+	public static final String ZZ_DOCACTION_SubmitToSnrMgrQA = "SQ";
+	/** Submit to Recommender = SR */
+	public static final String ZZ_DOCACTION_SubmitToRecommender = "SR";
+	/** Submit to Snr Mgr SRU = SS */
+	public static final String ZZ_DOCACTION_SubmitToSnrMgrSRU = "SS";
 	/** Submit to Line Manager = SU */
 	public static final String ZZ_DOCACTION_SubmitToLineManager = "SU";
+	/** Update = UP */
+	public static final String ZZ_DOCACTION_Update = "UP";
+	/** Verify = VE */
+	public static final String ZZ_DOCACTION_Verify = "VE";
 	/** Set Document Action.
 		@param ZZ_DocAction Document Action
 	*/
@@ -458,22 +507,104 @@ public class X_ZZ_Asset_Disposal extends PO implements I_ZZ_Asset_Disposal, I_Pe
 	public static final String ZZ_DOCSTATUS_ApprovedByManagerFinanceConsumables = "AC";
 	/** Approved = AP */
 	public static final String ZZ_DOCSTATUS_Approved = "AP";
+	/** Prepared for CEO = CF */
+	public static final String ZZ_DOCSTATUS_PreparedForCEO = "CF";
 	/** Completed = CO */
 	public static final String ZZ_DOCSTATUS_Completed = "CO";
 	/** Draft = DR */
 	public static final String ZZ_DOCSTATUS_Draft = "DR";
+	/** Error Importing = EE */
+	public static final String ZZ_DOCSTATUS_ErrorImporting = "EE";
+	/** Validation Error = ER */
+	public static final String ZZ_DOCSTATUS_ValidationError = "ER";
+	/** Evaluated = EV */
+	public static final String ZZ_DOCSTATUS_Evaluated = "EV";
+	/** Importing = IG */
+	public static final String ZZ_DOCSTATUS_Importing = "IG";
+	/** Imported = IM */
+	public static final String ZZ_DOCSTATUS_Imported = "IM";
 	/** In Progress = IP */
 	public static final String ZZ_DOCSTATUS_InProgress = "IP";
+	/** Not Recommended By Senior Mgr SDR = N1 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedBySeniorMgrSDR = "N1";
+	/** Not Recommended By Senior Mgr Finance = N2 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedBySeniorMgrFinance = "N2";
+	/** Not Recommended By COO = N3 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedByCOO = "N3";
+	/** Not Recommended By CFO = N4 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedByCFO = "N4";
+	/** Not Recommended By CEO = N5 */
+	public static final String ZZ_DOCSTATUS_NotRecommendedByCEO = "N5";
+	/** Not Approved by Snr Manager = NA */
+	public static final String ZZ_DOCSTATUS_NotApprovedBySnrManager = "NA";
 	/** Not Approved By Manager Finance Consumables = NC */
 	public static final String ZZ_DOCSTATUS_NotApprovedByManagerFinanceConsumables = "NC";
+	/** Not Approved By SDL Finance Mgr = ND */
+	public static final String ZZ_DOCSTATUS_NotApprovedBySDLFinanceMgr = "ND";
+	/** Not Approved By IT Manager = NI */
+	public static final String ZZ_DOCSTATUS_NotApprovedByITManager = "NI";
 	/** Not Approved by LM = NL */
 	public static final String ZZ_DOCSTATUS_NotApprovedByLM = "NL";
+	/** Not Approved = NP */
+	public static final String ZZ_DOCSTATUS_NotApproved = "NP";
+	/** Not Recommended = NR */
+	public static final String ZZ_DOCSTATUS_NotRecommended = "NR";
 	/** Not Approved by Snr Admin Finance = NS */
 	public static final String ZZ_DOCSTATUS_NotApprovedBySnrAdminFinance = "NS";
-	/** Submitted to Manager Finance Consumables = SC */
-	public static final String ZZ_DOCSTATUS_SubmittedToManagerFinanceConsumables = "SC";
+	/** Not Verified = NV */
+	public static final String ZZ_DOCSTATUS_NotVerified = "NV";
+	/** Pending = PE */
+	public static final String ZZ_DOCSTATUS_Pending = "PE";
+	/** Query = QR */
+	public static final String ZZ_DOCSTATUS_Query = "QR";
+	/** Recommended By Senior Mgr Finance = R1 */
+	public static final String ZZ_DOCSTATUS_RecommendedBySeniorMgrFinance = "R1";
+	/** Recommended By COO = R2 */
+	public static final String ZZ_DOCSTATUS_RecommendedByCOO = "R2";
+	/** Recommended By CFO = R3 */
+	public static final String ZZ_DOCSTATUS_RecommendedByCFO = "R3";
+	/** Recommended By CEO = R4 */
+	public static final String ZZ_DOCSTATUS_RecommendedByCEO = "R4";
+	/** Recommended By Officer - QA Accreditation = R5 */
+	public static final String ZZ_DOCSTATUS_RecommendedByOfficer_QAAccreditation = "R5";
+	/** Recommended By Mgr - QA Accreditation = R6 */
+	public static final String ZZ_DOCSTATUS_RecommendedByMgr_QAAccreditation = "R6";
+	/** Recommended By Snr Mgr QA = R7 */
+	public static final String ZZ_DOCSTATUS_RecommendedBySnrMgrQA = "R7";
+	/** Recommended By CRO = R8 */
+	public static final String ZZ_DOCSTATUS_RecommendedByCRO = "R8";
+	/** Recommended for Approval = RA */
+	public static final String ZZ_DOCSTATUS_RecommendedForApproval = "RA";
+	/** Recommended = RC */
+	public static final String ZZ_DOCSTATUS_Recommended = "RC";
+	/** Recommended By Senior Mgr SDR = RD */
+	public static final String ZZ_DOCSTATUS_RecommendedBySeniorMgrSDR = "RD";
+	/** Recommended for Evaluation = RE */
+	public static final String ZZ_DOCSTATUS_RecommendedForEvaluation = "RE";
+	/** Submitted to Snr Admin Finance = SA */
+	public static final String ZZ_DOCSTATUS_SubmittedToSnrAdminFinance = "SA";
+	/** Submitted to Manager Admin Finance = SC */
+	public static final String ZZ_DOCSTATUS_SubmittedToManagerAdminFinance = "SC";
+	/** Submitted To SDL Finance Mgr = SD */
+	public static final String ZZ_DOCSTATUS_SubmittedToSDLFinanceMgr = "SD";
+	/** Submitted To IT Manager = SI */
+	public static final String ZZ_DOCSTATUS_SubmittedToITManager = "SI";
+	/** Submitted To IT Admin = ST */
+	public static final String ZZ_DOCSTATUS_SubmittedToITAdmin = "ST";
 	/** Submitted = SU */
 	public static final String ZZ_DOCSTATUS_Submitted = "SU";
+	/** Transfer Out = TO */
+	public static final String ZZ_DOCSTATUS_TransferOut = "TO";
+	/** Updated by SDR Admin = UA */
+	public static final String ZZ_DOCSTATUS_UpdatedBySDRAdmin = "UA";
+	/** Uploaded = UP */
+	public static final String ZZ_DOCSTATUS_Uploaded = "UP";
+	/** Delinked = UnSdfOrg */
+	public static final String ZZ_DOCSTATUS_Delinked = "UnSdfOrg";
+	/** Validating = VA */
+	public static final String ZZ_DOCSTATUS_Validating = "VA";
+	/** Verified = VE */
+	public static final String ZZ_DOCSTATUS_Verified = "VE";
 	/** Set Document Status.
 		@param ZZ_DocStatus Document Status
 	*/

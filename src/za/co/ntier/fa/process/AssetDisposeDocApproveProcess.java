@@ -1,6 +1,9 @@
 package za.co.ntier.fa.process;
 
+import java.sql.Timestamp;
+
 import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.MAssetAcct;
 import org.compiere.model.MAssetDisposed;
 import org.compiere.model.MDepreciationExp;
 import org.compiere.model.MDepreciationWorkfile;
@@ -31,13 +34,30 @@ public class AssetDisposeDocApproveProcess extends AbstractDocApproveProcess<MZZ
 	protected void validateData() {
 		MPeriod.testPeriodOpen(getCtx(), poObj.getDateAcct(), MDocType.DOCBASETYPE_GLDocument, poObj.getAD_Org_ID());
 		
-		MDepreciationWorkfile assetwk = MDepreciationWorkfile.get(getCtx(), poObj.getA_Asset_ID(), X_A_Asset_Disposed.POSTINGTYPE_Actual, get_TrxName());
-		if (assetwk.isDepreciated(poObj.getDateAcct())){
-			throw new AdempiereException("@AssetAlreadyDepreciated@");
+		if (!isDisposedProrated()) {
+			MDepreciationWorkfile assetwk = MDepreciationWorkfile.get(getCtx(), poObj.getA_Asset_ID(), X_A_Asset_Disposed.POSTINGTYPE_Actual, get_TrxName());
+			if (assetwk != null && assetwk.isDepreciated(poObj.getDateAcct())){
+				throw new AdempiereException("@AssetAlreadyDepreciated@");
+			}
+			
+			MDepreciationExp.checkExistsNotProcessedEntries(getCtx(), poObj.getA_Asset_ID(), poObj.getDateAcct(), 
+					X_A_Asset_Disposed.POSTINGTYPE_Actual, get_TrxName());
 		}
-		
-		MDepreciationExp.checkExistsNotProcessedEntries(getCtx(), poObj.getA_Asset_ID(), poObj.getDateAcct(), 
-				X_A_Asset_Disposed.POSTINGTYPE_Actual, get_TrxName());
+	}
+	
+	private boolean isDisposedProrated() {
+		MDepreciationWorkfile assetwk = MDepreciationWorkfile.get(getCtx(), poObj.getA_Asset_ID(), X_A_Asset_Disposed.POSTINGTYPE_Actual, get_TrxName());
+		if (assetwk != null) {
+			try {
+				MAssetAcct assetAcct = MAssetAcct.forA_Asset_ID(getCtx(), assetwk.getC_AcctSchema_ID(), poObj.getA_Asset_ID(), X_A_Asset_Disposed.POSTINGTYPE_Actual, poObj.getDateAcct(), get_TrxName());
+				if (assetAcct != null) {
+					return assetAcct.isZZDisposedProrated();
+				}
+			} catch (Exception e) {
+				// If acct not found or error, fallback to false
+			}
+		}
+		return false;
 	}
 	
 	private void disposeAsset() {
@@ -45,7 +65,17 @@ public class AssetDisposeDocApproveProcess extends AbstractDocApproveProcess<MZZ
 		assetDisposed.setDateDoc(now);
 		assetDisposed.setDateAcct(poObj.getDateAcct());
 		assetDisposed.setA_Asset_ID(poObj.getA_Asset_ID());
-		assetDisposed.setA_Disposed_Method(X_A_Asset_Disposed.A_DISPOSED_METHOD_Trade);
+		if (isDisposedProrated()) {
+			assetDisposed.setA_Disposed_Method(X_A_Asset_Disposed.A_DISPOSED_METHOD_Prorated);
+			Timestamp disposedDate = poObj.getA_Disposed_Date();
+			if (disposedDate == null) {
+				disposedDate = poObj.getDateAcct();
+			}
+			assetDisposed.setA_Disposed_Date(disposedDate);
+		} else {
+			assetDisposed.setA_Disposed_Method(X_A_Asset_Disposed.A_DISPOSED_METHOD_Trade);
+			assetDisposed.setA_Disposed_Date(poObj.getDateAcct());
+		}
 		assetDisposed.saveEx();
 		poObj.setA_Asset_Disposed_ID(assetDisposed.getA_Asset_Disposed_ID());
 		poObj.saveEx();

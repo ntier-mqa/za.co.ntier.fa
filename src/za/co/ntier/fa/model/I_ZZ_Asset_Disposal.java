@@ -54,12 +54,12 @@ public interface I_ZZ_Asset_Disposal
     /** Column name AD_Org_ID */
     public static final String COLUMNNAME_AD_Org_ID = "AD_Org_ID";
 
-	/** Set Organization.
+	/** Set Unit.
 	  * Organizational entity within tenant
 	  */
 	public void setAD_Org_ID (int AD_Org_ID);
 
-	/** Get Organization.
+	/** Get Unit.
 	  * Organizational entity within tenant
 	  */
 	public int getAD_Org_ID();
@@ -89,6 +89,15 @@ public interface I_ZZ_Asset_Disposal
 	public int getA_Asset_ID();
 
 	public org.compiere.model.I_A_Asset getA_Asset() throws RuntimeException;
+
+    /** Column name A_Disposed_Date */
+    public static final String COLUMNNAME_A_Disposed_Date = "A_Disposed_Date";
+
+	/** Set Disposed Date	  */
+	public void setA_Disposed_Date (Timestamp A_Disposed_Date);
+
+	/** Get Disposed Date	  */
+	public Timestamp getA_Disposed_Date();
 
     /** Column name Created */
     public static final String COLUMNNAME_Created = "Created";
